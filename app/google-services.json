@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "846808767527",
+    "project_id": "triperience-274c4",
+    "storage_bucket": "triperience-274c4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:846808767527:android:bb964721cf9138e2228202",
+        "android_client_info": {
+          "package_name": "com.example.triperience"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "846808767527-94ka4hc436mf2shm8dtb2s93n98127ci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triperience",
+            "certificate_hash": "dc9ecaac23f3b17b7e9680d88fa109964b0bcf71"
+          }
+        },
+        {
+          "client_id": "846808767527-k8b7jpto4mi1la2ger28d8mqaimi2i2d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFReoouh00R38wd3uyHU_ruI_o3oxheIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "846808767527-k8b7jpto4mi1la2ger28d8mqaimi2i2d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
