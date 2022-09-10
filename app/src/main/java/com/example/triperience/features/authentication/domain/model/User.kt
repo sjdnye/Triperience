@@ -1,9 +1,9 @@
-package com.example.triperience.domain.model
+package com.example.triperience.features.authentication.domain.model
 
 data class User(
-    val uid: String = "",
+    val userid: String = "",
     val username: String = "",
-    val password: String = "",
     val email: String = "",
-    val imageUrl: String = "",
+    val bio: String = "",
+    val profileImage: String = "",
 )

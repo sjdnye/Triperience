@@ -1,6 +1,8 @@
 package com.example.triperience.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,11 +11,24 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AuthModule {
+object FirebaseModule {
 
     @Provides
     @Singleton
     fun provideFirebaseAuthentication(): FirebaseAuth{
         return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(): FirebaseStorage{
+        return FirebaseStorage.getInstance()
+
+    }
+
+    @Singleton
+    @Provides
+    fun provideFirebaseStore(): FirebaseFirestore{
+        return FirebaseFirestore.getInstance()
     }
 }
