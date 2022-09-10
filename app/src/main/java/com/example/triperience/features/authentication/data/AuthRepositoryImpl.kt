@@ -59,7 +59,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     }
 
-
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
@@ -86,11 +85,12 @@ class AuthRepositoryImpl @Inject constructor(
                     .get()
                     .await()
 
-                emit(Resource.Success(
-                    data = querySnapshot.documents
-                        .map { it.getString("username") }
-                        .none { it.equals(username, true) }
-                )
+                emit(
+                    Resource.Success(
+                        data = querySnapshot.documents
+                            .map { it.getString("username") }
+                            .none { it.equals(username, true) }
+                    )
                 )
             } catch (e: IOException) {
                 emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
@@ -106,7 +106,6 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             auth.signOut()
             emit(Resource.Success(true))
-
         } catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         } catch (e: HttpException) {
@@ -127,7 +126,6 @@ class AuthRepositoryImpl @Inject constructor(
                     .await()
 
                 emit(Resource.Success(data = snapshot.toObject<User>()))
-
             }
         } catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
@@ -136,83 +134,5 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         }
-
-    }
-
-    override fun getUserDetails(userid: String): Flow<Resource<User>> = callbackFlow {
-        trySend(Resource.Loading())
-        val snapShotListener = firestore.collection(Constants.COLLECTION_USERS)
-            .document(userid)
-            .addSnapshotListener { snapshot, error ->
-                val response = if (snapshot != null) {
-                    val userInfo = snapshot.toObject(User::class.java)
-                    Resource.Success<User>(userInfo!!)
-                } else {
-                    Resource.Error(error?.message ?: error.toString())
-                }
-                trySend(response).isSuccess
-            }
-        awaitClose {
-            snapShotListener.remove()
-        }
-    }
-
-    override fun setUserDetails(
-        userid: String,
-        userName: String,
-        bio: String
-    ): Flow<Resource<Boolean>> = flow {
-        emit(Resource.Loading())
-        try {
-            val userObj = mutableMapOf<String, String>()
-            userObj["username"] = userName
-            userObj["bio"] = bio
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(userid)
-                .update(userObj as Map<String, Any>)
-                .await()
-            emit(Resource.Success(true))
-
-        } catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        }
-
-    }
-
-
-    override suspend fun saveUserProfile(user: User): Flow<Resource<Boolean>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun uploadProfileImage(imageUri: Uri): Flow<Resource<Boolean>> = flow{
-        emit(Resource.Loading())
-        try {
-            val uploadTask = firebaseStorage.reference
-                .child("${Constants.PROFILE_IMAGE_STORAGE_REF}/image_${System.currentTimeMillis()}")
-                .putFile(Uri.parse(imageUri.toString())).await()
-
-            val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
-            val userObj = mutableMapOf<String,String>()
-            userObj["profileImage"] = downloadUrl
-
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(auth.currentUser?.uid!!)
-                .update(userObj as Map<String, Any>)
-                .await()
-            emit(Resource.Success(true))
-
-
-        } catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        }
-
     }
 }

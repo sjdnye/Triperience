@@ -21,17 +21,5 @@ interface AuthRepository {
 
     suspend fun getUser() : Flow<Resource<User?>>
 
-    fun getUserDetails(userid:String): Flow<Resource<User>>
-
-    fun setUserDetails(
-        userid: String,
-        userName: String,
-        bio: String,
-    ) : Flow<Resource<Boolean>>
-
-    suspend fun saveUserProfile(user: User): Flow<Resource<Boolean>>
-
-    suspend fun uploadProfileImage(imageUri: Uri): Flow<Resource<Boolean>>
-
 
 }
