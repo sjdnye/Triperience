@@ -4,7 +4,7 @@ import com.example.triperience.features.authentication.domain.model.User
 
 object AuthValidator {
 
-    fun validateCreateUserRequest(username:String, email: String, password: String): Resource<User?> {
+    fun validateCreateUserRequest(username:String, email: String, password: String, confirmedPassword:String): Resource<User?> {
 
         if (username.isBlank() && password.isBlank() && email.isBlank()) {
             return Resource.Error(message = "All fields are empty")
@@ -26,8 +26,14 @@ object AuthValidator {
         if (password.isBlank()) {
             return Resource.Error("Password can not be blank")
         }
+        if (confirmedPassword.isBlank()) {
+            return Resource.Error("Confirm password can not be blank")
+        }
+        if (password != confirmedPassword){
+            return Resource.Error(message = "Password and confirm password are not equal")
+        }
         if (password.length < 6) {
-            return Resource.Error(message = "Password length should be at least 6 characters.")
+            return Resource.Error(message = "Password length should be at least 6 characters")
         }
         return Resource.Success(data = null)
     }

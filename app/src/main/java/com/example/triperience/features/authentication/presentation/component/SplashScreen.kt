@@ -17,7 +17,7 @@ import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.AuthViewModel
-import com.example.triperience.features.authentication.presentation.component.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -59,6 +59,5 @@ fun SplashScreen(
 //        Image(painter = painterResource(id = R.drawable.ic_instagram_logo),
 //            contentDescription = "Splash Screen Logo", modifier = Modifier.scale(scale.value))
 //    }
-
 
 }

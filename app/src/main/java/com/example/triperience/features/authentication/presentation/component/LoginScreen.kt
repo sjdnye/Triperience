@@ -1,14 +1,14 @@
 package com.example.triperience.features.authentication.presentation.component
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,11 +16,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.Start
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,7 +41,9 @@ import com.example.triperience.features.authentication.presentation.Authenticati
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
@@ -42,7 +51,11 @@ fun LoginScreen(
     navigator: DestinationsNavigator,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val bringIntoViewRequester = BringIntoViewRequester()
 
     var email by remember {
         mutableStateOf("")
@@ -66,7 +79,6 @@ fun LoginScreen(
                         message = it.message
                     )
                 }
-
             }
         }
     }
@@ -96,6 +108,8 @@ fun LoginScreen(
                     )
                 },
                 contentColor = MaterialTheme.colors.primary,
+                elevation = 0.dp,
+                modifier = Modifier.shadow(0.dp)
             )
         }
     ) {
@@ -134,7 +148,15 @@ fun LoginScreen(
                     onValueChange = {
                         email = it
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .onFocusEvent { event ->
+                            if (event.isFocused) {
+                                coroutineScope.launch {
+                                    bringIntoViewRequester.bringIntoView()
+                                }
+                            }
+                        }
+                        .fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
                         focusedIndicatorColor = MaterialTheme.colors.primary,
@@ -150,9 +172,16 @@ fun LoginScreen(
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Email, contentDescription = "enter email")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
                     )
+                )
                 Spacer(modifier = Modifier.height(10.dp))
                 TextField(
                     value = password,
@@ -184,32 +213,45 @@ fun LoginScreen(
                                 passwordVisibility = !passwordVisibility
 
                             }
-                        ){
+                        ) {
                             Icon(imageVector = icon, contentDescription = "Visibility icon")
                         }
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = if(passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
                 )
                 Spacer(modifier = Modifier.height(30.dp))
                 Button(
                     modifier = Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester)
                         .wrapContentHeight()
                         .fillMaxWidth(),
                     onClick = {
-
+                        keyboardController?.hide()
                     },
                     shape = RoundedCornerShape(10.dp),
 
                     ) {
-                    Text(
-                        text = "Login",
-                        color = MaterialTheme.colors.onPrimary
-                    )
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(CenterVertically),
+                            color = MaterialTheme.colors.onPrimary
+                        )
+                    } else {
+                        Text(
+                            text = "Login",
+                            color = MaterialTheme.colors.onPrimary
+                        )
+                    }
                 }
-            }
-            if (viewModel.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }

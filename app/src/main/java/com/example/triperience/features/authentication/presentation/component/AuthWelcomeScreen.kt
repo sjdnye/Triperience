@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.features.authentication.presentation.AuthViewModel
-import com.example.triperience.features.authentication.presentation.component.destinations.LoginScreenDestination
-import com.example.triperience.features.authentication.presentation.component.destinations.RegisterScreenDestination
+import com.example.triperience.features.destinations.LoginScreenDestination
+import com.example.triperience.features.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 

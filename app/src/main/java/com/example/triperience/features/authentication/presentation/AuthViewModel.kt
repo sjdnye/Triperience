@@ -57,7 +57,8 @@ class AuthViewModel @Inject constructor(
                 val result = AuthValidator.validateCreateUserRequest(
                     authScreenEvents.username,
                     authScreenEvents.email,
-                    authScreenEvents.password
+                    authScreenEvents.password,
+                    authScreenEvents.confirmedPassword
                 )
                 when (result) {
                     is Resource.Success -> {

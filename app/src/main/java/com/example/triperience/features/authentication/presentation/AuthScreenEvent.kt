@@ -5,6 +5,7 @@ sealed class AuthScreenEvents {
     data class OnRegister(
         val email: String,
         val password: String,
-        val username: String
+        val username: String,
+        val confirmedPassword: String
     ) : AuthScreenEvents()
 }
