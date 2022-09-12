@@ -19,7 +19,7 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    var isUserAuthenticated: Boolean = false
+    var isUserAuthenticated by mutableStateOf(false)
 
 
     var isLoading by mutableStateOf(false)
@@ -137,7 +137,6 @@ class AuthViewModel @Inject constructor(
                     }
                 }
         }
-
     }
 
     fun getUser() {
@@ -149,6 +148,4 @@ class AuthViewModel @Inject constructor(
             _authEventFlow.emit(authenticationUiEvent)
         }
     }
-
-
 }

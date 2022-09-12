@@ -1,4 +1,4 @@
-package com.example.triperience.features.authentication.domain.repository
+package com.example.triperience.features.profile.domain.repository
 
 import android.net.Uri
 import com.example.triperience.features.authentication.domain.model.User

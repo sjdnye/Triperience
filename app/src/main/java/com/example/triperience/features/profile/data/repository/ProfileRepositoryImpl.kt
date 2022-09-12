@@ -1,8 +1,8 @@
-package com.example.triperience.features.authentication.data
+package com.example.triperience.features.profile.data.repository
 
 import android.net.Uri
 import com.example.triperience.features.authentication.domain.model.User
-import com.example.triperience.features.authentication.domain.repository.ProfileRepository
+import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.await

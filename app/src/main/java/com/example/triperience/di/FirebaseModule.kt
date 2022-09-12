@@ -1,9 +1,9 @@
 package com.example.triperience.di
 
 import com.example.triperience.features.authentication.data.AuthRepositoryImpl
-import com.example.triperience.features.authentication.data.ProfileRepositoryImpl
+import com.example.triperience.features.profile.data.repository.ProfileRepositoryImpl
 import com.example.triperience.features.authentication.domain.repository.AuthRepository
-import com.example.triperience.features.authentication.domain.repository.ProfileRepository
+import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -48,7 +48,7 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideProfileRepository(firebaseStorage: FirebaseStorage, firestore: FirebaseFirestore, auth: FirebaseAuth): ProfileRepository{
+    fun provideProfileRepository(firebaseStorage: FirebaseStorage, firestore: FirebaseFirestore, auth: FirebaseAuth): ProfileRepository {
         return ProfileRepositoryImpl(
             firebaseStorage = firebaseStorage,
             firestore = firestore,
