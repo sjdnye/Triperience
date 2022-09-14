@@ -31,13 +31,19 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.toLowerCase
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.features.authentication.presentation.AuthScreenEvents
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.authentication.presentation.AuthenticationUiEvent
+import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.HomeScreenDestination
+import com.example.triperience.features.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.*
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -82,7 +88,10 @@ fun RegisterScreen(
         viewModel.authEventFlow.collectLatest {
             when (it) {
                 is AuthenticationUiEvent.NavigateToMainScreen -> {
-
+                    navigator.navigate(HomeScreenDestination){
+                        popUpTo(RegisterScreenDestination.route){inclusive = true}
+                        popUpTo(AuthWelcomeScreenDestination.route){inclusive = true}
+                    }
                 }
                 is AuthenticationUiEvent.ShowMessage -> {
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -316,7 +325,14 @@ fun RegisterScreen(
                         .wrapContentHeight(),
                     onClick = {
                         keyboardController?.hide()
-
+                        viewModel.onEvent(
+                            AuthScreenEvents.OnRegister(
+                                username = username.trim().lowercase(Locale.getDefault()),
+                                email = email.trim(),
+                                password = password.trim(),
+                                confirmedPassword = confirmPassword.trim()
+                            )
+                        )
                     },
                     shape = RoundedCornerShape(10.dp),
                 ) {

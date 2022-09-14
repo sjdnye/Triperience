@@ -7,4 +7,5 @@ object Constants{
     const val PROFILE_IMAGE_STORAGE_REF: String = "profileImages"
     const val PROFILE_IMAGE_URL: String = "profileImageUrl"
     const val CURRENT_USER: String = "currentUser"
+    const val USER_ID: String = "userId"
 }

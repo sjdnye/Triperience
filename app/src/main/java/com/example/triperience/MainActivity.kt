@@ -24,19 +24,23 @@ import com.example.triperience.features.destinations.ProfileScreenDestination
 import com.example.triperience.features.destinations.SearchScreenDestination
 import com.example.triperience.ui.theme.TriperienceTheme
 import com.example.triperience.utils.bottomNavigaton.CustomBottomNavBar
+import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.NavGraph
 import com.ramcosta.composedestinations.rememberNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sharedPrefUtil: SharedPrefUtil
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
 
             val navController = rememberNavController()
             val navHostEngine = rememberNavHostEngine()
@@ -61,7 +65,7 @@ class MainActivity : ComponentActivity() {
                         backgroundColor = MaterialTheme.colors.background,
                         bottomBar = {
                             if (showBottomBar) {
-                                CustomBottomNavBar(navController = navController)
+                                CustomBottomNavBar(navController = navController, sharedPrefUtil = sharedPrefUtil)
                             }
                         }
                     ) {

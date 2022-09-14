@@ -1,6 +1,5 @@
 package com.example.triperience.utils.bottomNavigaton
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -17,14 +16,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.triperience.features.destinations.DirectionDestination
-import com.example.triperience.features.destinations.HomeScreenDestination
-import com.example.triperience.features.destinations.ProfileScreenDestination
-import com.example.triperience.features.destinations.SearchScreenDestination
+import com.example.triperience.features.destinations.*
+import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 
 data class BottomNavigationItem(
-    val icon : ImageVector,
-    val destination: DirectionDestination
+    val icon: ImageVector,
+    val destination: Destination
 )
 
 val bottomNavItems = listOf(
@@ -40,14 +37,16 @@ val bottomNavItems = listOf(
         icon = Icons.Default.Person,
         destination = ProfileScreenDestination
     )
+
 )
 
 @Composable
 fun CustomBottomNavBar(
+    modifier: Modifier = Modifier,
     navController: NavController,
     navItems: List<BottomNavigationItem> = bottomNavItems,
-    modifier: Modifier = Modifier
-){
+    sharedPrefUtil: SharedPrefUtil
+) {
     val darkTheme: Boolean = isSystemInDarkTheme()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -57,14 +56,14 @@ fun CustomBottomNavBar(
         backgroundColor = MaterialTheme.colors.background,
         elevation = 0.dp
     ) {
-        navItems.forEach{ item ->
+        navItems.forEach { item ->
             val selectedNavItem = currentRoute?.contains(item.destination.route) == true
             BottomNavigationItem(
                 selected = item.destination.route == currentRoute,
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = MaterialTheme.colors.onBackground,
                 icon = {
-                      Icon(imageVector = item.icon, contentDescription = null)
+                    Icon(imageVector = item.icon, contentDescription = null)
                 },
                 onClick = {
                     if (!selectedNavItem) {

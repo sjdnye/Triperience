@@ -36,10 +36,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.features.authentication.presentation.AuthScreenEvents
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.authentication.presentation.AuthenticationUiEvent
+import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.HomeScreenDestination
+import com.example.triperience.features.destinations.LoginScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.popUpTo
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -72,6 +77,10 @@ fun LoginScreen(
         viewModel.authEventFlow.collectLatest {
             when (it) {
                 is AuthenticationUiEvent.NavigateToMainScreen -> {
+                    navigator.navigate(HomeScreenDestination){
+                        popUpTo(LoginScreenDestination.route){inclusive = true}
+                        popUpTo(AuthWelcomeScreenDestination.route){ inclusive = true}
+                    }
 
                 }
                 is AuthenticationUiEvent.ShowMessage -> {
@@ -224,6 +233,7 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
+
                         }
                     ),
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
@@ -236,6 +246,12 @@ fun LoginScreen(
                         .fillMaxWidth(),
                     onClick = {
                         keyboardController?.hide()
+                        viewModel.onEvent(
+                            AuthScreenEvents.OnLogin(
+                                email = email.trim(),
+                                password = password.trim()
+                            )
+                        )
                     },
                     shape = RoundedCornerShape(10.dp),
 

@@ -55,10 +55,10 @@ class AuthViewModel @Inject constructor(
 
             is AuthScreenEvents.OnRegister -> {
                 val result = AuthValidator.validateCreateUserRequest(
-                    authScreenEvents.username,
-                    authScreenEvents.email,
-                    authScreenEvents.password,
-                    authScreenEvents.confirmedPassword
+                    username = authScreenEvents.username,
+                    email = authScreenEvents.email,
+                    password = authScreenEvents.password,
+                    confirmedPassword = authScreenEvents.confirmedPassword
                 )
                 when (result) {
                     is Resource.Success -> {
@@ -69,6 +69,7 @@ class AuthViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
+                        println("Error has occurred")
                         sendAuthUiEvent(
                             AuthenticationUiEvent.ShowMessage(message = result.message.toString())
                         )
@@ -81,6 +82,7 @@ class AuthViewModel @Inject constructor(
 
     private fun register(username: String, email: String, password: String) {
         viewModelScope.launch {
+            isLoading = true
             authRepository.checkUsernameAvailability(username = username).collect { response ->
                 when (response) {
                     is Resource.Success -> {
@@ -105,10 +107,12 @@ class AuthViewModel @Inject constructor(
                                 }
                             }
                         } else {
+                            isLoading = false
                             sendAuthUiEvent(AuthenticationUiEvent.ShowMessage(message = "This username is already exist!"))
                         }
                     }
                     is Resource.Error -> {
+                        isLoading = false
                         sendAuthUiEvent(AuthenticationUiEvent.ShowMessage(message = response.message.toString()))
                     }
                     else -> {}

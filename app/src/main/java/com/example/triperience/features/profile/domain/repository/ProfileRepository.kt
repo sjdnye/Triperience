@@ -7,14 +7,25 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
-    fun getUserDetails(userid:String): Flow<Resource<User>>
+    fun getUserInformation(userid: String): Flow<Resource<User>>
 
-    suspend fun setUserDetails(
+    suspend fun setUserInformation(
         userid: String,
         userName: String,
         bio: String,
-    ) : Flow<Resource<Boolean>>
+    ): Flow<Resource<Boolean>>
 
     suspend fun uploadProfileImage(imageUri: Uri): Flow<Resource<Boolean>>
+
+    suspend fun followUser(
+        myId: String,
+        userid: String
+    ): Flow<Resource<Boolean>>
+
+    suspend fun unFollowUser(
+        myId: String,
+        userid: String
+    ): Flow<Resource<Boolean>>
+
 
 }

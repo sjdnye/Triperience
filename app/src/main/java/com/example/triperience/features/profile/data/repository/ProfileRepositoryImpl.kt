@@ -7,6 +7,7 @@ import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.await
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
@@ -23,7 +24,7 @@ class ProfileRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : ProfileRepository {
 
-    override fun getUserDetails(userid: String): Flow<Resource<User>> = callbackFlow {
+    override fun getUserInformation(userid: String): Flow<Resource<User>> = callbackFlow {
         trySend(Resource.Loading())
         val snapShotListener = firestore.collection(Constants.COLLECTION_USERS)
             .document(userid)
@@ -41,7 +42,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setUserDetails(
+    override suspend fun setUserInformation(
         userid: String,
         userName: String,
         bio: String
@@ -83,6 +84,57 @@ class ProfileRepositoryImpl @Inject constructor(
             emit(Resource.Success(true))
 
         } catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+    }
+
+    override suspend fun followUser(
+        myId:String,
+        userid: String
+    ): Flow<Resource<Boolean>> = flow{
+        try {
+            emit(Resource.Loading())
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(myId)
+                .update("following",FieldValue.arrayUnion(userid))
+                .await()
+
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(userid)
+                .update("followers", FieldValue.arrayUnion(myId))
+                .await()
+
+            emit(Resource.Success(data = true))
+
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+    }
+
+    override suspend fun unFollowUser(myId: String, userid: String): Flow<Resource<Boolean>> = flow {
+        try {
+            emit(Resource.Loading())
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(myId)
+                .update("following",FieldValue.arrayRemove(userid))
+                .await()
+
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(userid)
+                .update("followers", FieldValue.arrayRemove(myId))
+                .await()
+
+            emit(Resource.Success(data = true))
+
+        }catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))

@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -48,8 +49,8 @@ fun SplashScreen(
         delay(1000)
 
         if (viewModel.isUserAuthenticated) {
-//            navigator.popBackStack()
-//            navigator.navigate()
+            navigator.popBackStack()
+            navigator.navigate(HomeScreenDestination)
         } else {
             navigator.popBackStack()
             navigator.navigate(AuthWelcomeScreenDestination)
