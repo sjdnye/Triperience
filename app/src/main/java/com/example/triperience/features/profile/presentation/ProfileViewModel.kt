@@ -33,7 +33,7 @@ class ProfileViewModel @Inject constructor(
     var state by mutableStateOf<ProfileState>(ProfileState())
         private set
 
-    private var meUser by mutableStateOf<User?>(null)
+    var meUser by mutableStateOf<User?>(null)
 
 
     var mainButtonText by mutableStateOf("")
