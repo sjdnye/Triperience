@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,12 +45,16 @@ import com.example.triperience.R
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.EditScreenDestination
 import com.example.triperience.features.destinations.ProfileScreenDestination
 import com.example.triperience.features.profile.presentation.ProfileViewModel
+import com.example.triperience.features.profile.presentation.component.CoilImage
+import com.example.triperience.features.profile.presentation.component.CustomBottomSheet
 import com.example.triperience.ui.theme.LightBlue900
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -70,6 +76,23 @@ fun ProfileScreen(
     )
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(key1 = true){
+        profileViewModel.profileEventFlow.collect{
+            when(it){
+                is ProfileScreenUiEvent.ShowMessage -> {
+                    if (it.showToast){
+                        Toast.makeText(context,it.message, Toast.LENGTH_LONG).show()
+                    }else{
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = it.message
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetContent = {
@@ -80,7 +103,12 @@ fun ProfileScreen(
                             Toast.makeText(context, "upload a post", Toast.LENGTH_LONG).show()
                         }
                         1 -> {
-                            Toast.makeText(context, "Edit profile", Toast.LENGTH_LONG).show()
+                            //go to EditProfileScreen
+                            scope.launch {
+                                scaffoldState.bottomSheetState.collapse()
+                            }
+                            navigator.navigate(EditScreenDestination)
+
                         }
                     }
                 },
@@ -240,10 +268,13 @@ fun ProfileHeader(
                         .weight(6f),
                     maxLines = 4,
                     textAlign = TextAlign.Start,
+                    overflow = TextOverflow.Ellipsis
                 )
             }else{
                 Box(
-                    modifier = Modifier.weight(6f).fillMaxSize(),
+                    modifier = Modifier
+                        .weight(6f)
+                        .fillMaxSize(),
                     contentAlignment = Center
                 ) {
                     Text(
@@ -258,86 +289,5 @@ fun ProfileHeader(
     }
 }
 
-@Composable
-fun CoilImage(
-    imageUrl: String,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .clip(CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        val painter = rememberImagePainter(
-            data = imageUrl,
-            builder = {
-                transformations(
-                    CircleCropTransformation(),
-                )
-                placeholder(R.drawable.default_image_profile)
-            },
-        )
-        val painterState = painter.state
-        Image(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape)
-                .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            ,
-            painter = painter,
-            contentDescription = "profile image",
 
-        )
-    }
-}
 
-@Composable
-fun CustomBottomSheet(
-    modifier: Modifier = Modifier,
-    onClick: (menuItem: Int) -> Unit
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .clip(RoundedCornerShape(10.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onClick(0)
-                    },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AddToPhotos,
-                    contentDescription = "add photo"
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "Upload a post")
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onClick(1)
-                    },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Profile"
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "Edit Profile")
-            }
-        }
-
-    }
-}

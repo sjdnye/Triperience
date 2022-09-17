@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,7 +30,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.toLowerCase
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.features.authentication.presentation.AuthScreenEvents
 import com.example.triperience.features.authentication.presentation.AuthViewModel
@@ -88,9 +86,9 @@ fun RegisterScreen(
         viewModel.authEventFlow.collectLatest {
             when (it) {
                 is AuthenticationUiEvent.NavigateToMainScreen -> {
-                    navigator.navigate(HomeScreenDestination){
-                        popUpTo(RegisterScreenDestination.route){inclusive = true}
-                        popUpTo(AuthWelcomeScreenDestination.route){inclusive = true}
+                    navigator.navigate(HomeScreenDestination) {
+                        popUpTo(RegisterScreenDestination.route) { inclusive = true }
+                        popUpTo(AuthWelcomeScreenDestination.route) { inclusive = true }
                     }
                 }
                 is AuthenticationUiEvent.ShowMessage -> {
@@ -163,66 +161,44 @@ fun RegisterScreen(
                     style = MaterialTheme.typography.body2
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                TextField(
+                CustomTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = username,
                     onValueChange = {
                         username = it
                     },
-                    label = {
-                        Text(text = "Username")
-                    },
-                    placeholder = {
-                        Text(text = "Enter username")
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "enter username"
-                        )
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colors.primary,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
-
+                    label = "Username",
+                    placeholder = "Enter username",
+                    leadingIcon = Icons.Default.Person,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
                         }
-                    ),
+                    )
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                CustomTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = email,
                     onValueChange = {
-                        email = it
+                                    email = it
                     },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = "Email")
-                    },
-                    placeholder = {
-                        Text(text = "Enter email")
-                    },
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Default.Email, contentDescription = "enter email")
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colors.primary,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
+                    label = "Email",
+                    placeholder = "Enter email",
+                    leadingIcon = Icons.Default.Email,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
                         }
-                    ),
+                    )
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 TextField(
@@ -259,7 +235,10 @@ fun RegisterScreen(
                             Icon(imageVector = passwordIcon, contentDescription = "Visibility icon")
                         }
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
@@ -310,7 +289,10 @@ fun RegisterScreen(
                             Icon(imageVector = confirmIcon, contentDescription = "Visibility icon")
                         }
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password , imeAction = ImeAction.Done),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
@@ -352,3 +334,39 @@ fun RegisterScreen(
         }
     }
 }
+
+//TextField(
+//modifier = Modifier.fillMaxWidth(),
+//value = username,
+//onValueChange = {
+//    username = it
+//},
+//label = {
+//    Text(text = "Username")
+//},
+//placeholder = {
+//    Text(text = "Enter username")
+//},
+//leadingIcon = {
+//    Icon(
+//        imageVector = Icons.Default.Person,
+//        contentDescription = "enter username"
+//    )
+//},
+//colors = TextFieldDefaults.textFieldColors(
+//backgroundColor = Color.Transparent,
+//focusedIndicatorColor = MaterialTheme.colors.primary,
+//unfocusedIndicatorColor = Color.Transparent,
+//disabledIndicatorColor = Color.Transparent
+//
+//),
+//keyboardOptions = KeyboardOptions(
+//keyboardType = KeyboardType.Text,
+//imeAction = ImeAction.Done
+//),
+//keyboardActions = KeyboardActions(
+//onDone = {
+//    focusManager.clearFocus()
+//}
+//),
+//)

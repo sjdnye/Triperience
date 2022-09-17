@@ -5,7 +5,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -32,7 +30,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,7 +41,6 @@ import com.example.triperience.features.destinations.HomeScreenDestination
 import com.example.triperience.features.destinations.LoginScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.popUpTo
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -77,9 +73,9 @@ fun LoginScreen(
         viewModel.authEventFlow.collectLatest {
             when (it) {
                 is AuthenticationUiEvent.NavigateToMainScreen -> {
-                    navigator.navigate(HomeScreenDestination){
-                        popUpTo(LoginScreenDestination.route){inclusive = true}
-                        popUpTo(AuthWelcomeScreenDestination.route){ inclusive = true}
+                    navigator.navigate(HomeScreenDestination) {
+                        popUpTo(LoginScreenDestination.route) { inclusive = true }
+                        popUpTo(AuthWelcomeScreenDestination.route) { inclusive = true }
                     }
 
                 }
@@ -118,7 +114,7 @@ fun LoginScreen(
                 },
                 contentColor = MaterialTheme.colors.primary,
                 elevation = 0.dp,
-                modifier = Modifier.shadow(0.dp)
+                modifier = Modifier.shadow(0.dp),
             )
         }
     ) {
@@ -152,11 +148,7 @@ fun LoginScreen(
                     style = MaterialTheme.typography.body2
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                TextField(
-                    value = email,
-                    onValueChange = {
-                        email = it
-                    },
+                CustomTextField(
                     modifier = Modifier
                         .onFocusEvent { event ->
                             if (event.isFocused) {
@@ -166,21 +158,13 @@ fun LoginScreen(
                             }
                         }
                         .fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colors.primary,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
-                    ),
-                    label = {
-                        Text(text = "Email")
+                    value = email,
+                    onValueChange = {
+                        email = it
                     },
-                    placeholder = {
-                        Text(text = "Enter email")
-                    },
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Default.Email, contentDescription = "enter email")
-                    },
+                    label = "Email",
+                    placeholder = "Enter email",
+                    leadingIcon = Icons.Default.Email,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Done
@@ -233,7 +217,6 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
-
                         }
                     ),
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
@@ -272,3 +255,45 @@ fun LoginScreen(
         }
     }
 }
+
+
+//                TextField(
+//                    value = email,
+//                    onValueChange = {
+//                        email = it
+//                    },
+//                    modifier = Modifier
+//                        .onFocusEvent { event ->
+//                            if (event.isFocused) {
+//                                coroutineScope.launch {
+//                                    bringIntoViewRequester.bringIntoView()
+//                                }
+//                            }
+//                        }
+//                        .fillMaxWidth(),
+//                    colors = TextFieldDefaults.textFieldColors(
+//                        backgroundColor = Color.Transparent,
+//                        focusedIndicatorColor = MaterialTheme.colors.primary,
+//                        unfocusedIndicatorColor = Color.Transparent,
+//                        disabledIndicatorColor = Color.Transparent
+//                    ),
+//                    label = {
+//                        Text(text = "Email")
+//                    },
+//                    placeholder = {
+//                        Text(text = "Enter email")
+//                    },
+//                    leadingIcon = {
+//                        Icon(imageVector = Icons.Default.Email, contentDescription = "enter email")
+//                    },
+//                    keyboardOptions = KeyboardOptions(
+//                        keyboardType = KeyboardType.Email,
+//                        imeAction = ImeAction.Done
+//                    ),
+//                    keyboardActions = KeyboardActions(
+//                        onDone = {
+//                            focusManager.clearFocus()
+//                        }
+//                    )
+//                )
+

@@ -58,8 +58,9 @@ class ProfileViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         state = state.copy(user = result.data, isLoading = false, error = "")
-                        if (userId == auth.currentUser?.uid) {
-                            sharedPrefUtil.saveCurrentUser(state.user)
+                        if (userId == meUser?.userid.toString()) {
+                            sharedPrefUtil.saveCurrentUser(result.data)
+                            meUser = result.data
                         }
                     }
                     is Resource.Error -> {
