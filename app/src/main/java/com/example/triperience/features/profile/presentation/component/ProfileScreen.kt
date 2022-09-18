@@ -1,4 +1,4 @@
-package com.example.triperience.features.profile.presentation
+package com.example.triperience.features.profile.presentation.component
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -47,6 +47,7 @@ import com.example.triperience.features.authentication.presentation.AuthViewMode
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
 import com.example.triperience.features.destinations.EditScreenDestination
 import com.example.triperience.features.destinations.ProfileScreenDestination
+import com.example.triperience.features.profile.presentation.ProfileScreenUiEvent
 import com.example.triperience.features.profile.presentation.ProfileViewModel
 import com.example.triperience.features.profile.presentation.component.CoilImage
 import com.example.triperience.features.profile.presentation.component.CustomBottomSheet

@@ -71,7 +71,7 @@ fun ImagePickerPermissionChecker(
                 } else if (storagePermission.status.shouldShowRationale) {
                     showPermissionRationale.value = showPermissionRationale.value.copy(
                         showDialog = true,
-                        message = "InstagramClone Requires this Storage permission to access images in your phones Gallery.",
+                        message = "Triperience Requires this Storage permission to access images in your phones Gallery.",
                         imageVector = Icons.Filled.Image,
                         permission = Constants.GALLERY
                     )
@@ -89,7 +89,7 @@ fun ImagePickerPermissionChecker(
                 } else if (cameraPermission.status.shouldShowRationale) {
                     showPermissionRationale.value = showPermissionRationale.value.copy(
                         showDialog = true,
-                        message = "InstagramClone Requires this Camera permission to access your phones Camera.",
+                        message = "Triperiece Requires this Camera permission to access your phones Camera.",
                         imageVector = Icons.Filled.Camera,
                         permission = Constants.CAMERA
                     )

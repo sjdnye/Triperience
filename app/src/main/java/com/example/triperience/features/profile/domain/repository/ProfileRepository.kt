@@ -15,7 +15,7 @@ interface ProfileRepository {
         bio: String,
     ): Flow<Resource<Boolean>>
 
-    suspend fun uploadProfileImage(imageUri: Uri): Flow<Resource<Boolean>>
+    suspend fun uploadProfileImage(imageUri: Uri, userid: String): Flow<Resource<Boolean>>
 
     suspend fun followUser(
         myId: String,

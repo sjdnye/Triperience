@@ -88,7 +88,6 @@ fun RationalDialogUI(
                     modifier = Modifier.padding(vertical = 7.dp)
                 )
             }
-
         }
     }
 }

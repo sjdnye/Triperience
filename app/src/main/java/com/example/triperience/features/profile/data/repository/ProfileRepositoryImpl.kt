@@ -66,7 +66,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun uploadProfileImage(imageUri: Uri): Flow<Resource<Boolean>> = flow{
+    override suspend fun uploadProfileImage(imageUri: Uri, userid: String): Flow<Resource<Boolean>> = flow{
         emit(Resource.Loading())
         try {
             val uploadTask = firebaseStorage.reference
@@ -78,7 +78,7 @@ class ProfileRepositoryImpl @Inject constructor(
             userObj["profileImage"] = downloadUrl
 
             firestore.collection(Constants.COLLECTION_USERS)
-                .document(auth.currentUser?.uid!!)
+                .document(userid)
                 .update(userObj as Map<String, Any>)
                 .await()
             emit(Resource.Success(true))

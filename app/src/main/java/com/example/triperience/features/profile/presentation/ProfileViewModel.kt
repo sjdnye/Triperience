@@ -135,18 +135,17 @@ class ProfileViewModel @Inject constructor(
 
     fun uploadImageProfile(imageUrl: Uri) {
         viewModelScope.launch {
-            profileRepository.uploadProfileImage(imageUri = imageUrl).collect { result ->
+            profileRepository.uploadProfileImage(imageUri = imageUrl,userid = meUser?.userid!!).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         state = state.copy(isLoading = false)
-                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = "Profile image changed successfully"))
+                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = "Profile image changed successfully", showToast = true))
                     }
                     is Resource.Error -> {
                         state = state.copy(isLoading = false)
                         sendProfileUiEvent(
                             ProfileScreenUiEvent.ShowMessage(
                                 message = result.message.toString(),
-                                showToast = true
                             )
                         )
                     }

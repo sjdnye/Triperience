@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -22,6 +24,8 @@ import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -32,16 +36,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.component.CustomTextField
 import com.example.triperience.features.authentication.presentation.component.CustomTextField2
 import com.example.triperience.features.profile.presentation.ProfileScreenUiEvent
 import com.example.triperience.features.profile.presentation.ProfileViewModel
+import com.example.triperience.utils.common.ImagePickerPermissionChecker
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
@@ -54,11 +61,11 @@ fun EditScreen(
     val scaffoldState = rememberScaffoldState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val bottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-
-
-    val uri by remember {
-        mutableStateOf<Uri?>(null)
+    var imageUri by remember {
+        mutableStateOf<Uri?>(Uri.parse(viewModel.meUser?.profileImage))
     }
     var username by remember {
         mutableStateOf(viewModel.meUser?.username!!)
@@ -138,37 +145,51 @@ fun EditScreen(
                     .fillMaxSize(),
 //                    horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+
                 Image(
-                    painter = painterResource(id = R.drawable.default_image_profile),
+                    painter = if (imageUri == null) {
+                        painterResource(id = R.drawable.default_image_profile)
+                    } else rememberAsyncImagePainter(model = Uri.parse(imageUri.toString())),
                     contentDescription = "",
                     modifier = Modifier
                         .size(150.dp)
-                        .clip(CircleShape)
                         .align(CenterHorizontally)
-
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
+
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = if (uri != null) Arrangement.SpaceAround else Arrangement.Center
+                    horizontalArrangement = if (imageUri != null) Arrangement.SpaceAround else Arrangement.Center
                 ) {
                     Text(
                         text = "Change photo",
-                        modifier = Modifier,
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
                             textAlign = TextAlign.Center
-                        )
+                        ),
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    bottomSheetState.show()
+                                }
+                            },
                     )
-                    if (uri != null) {
+                    if (imageUri != null) {
                         Text(
                             text = "Save Profile image",
-                            modifier = Modifier,
                             style = TextStyle(
                                 color = MaterialTheme.colors.primary,
                                 textAlign = TextAlign.Center
+                            ),
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.uploadImageProfile(imageUrl = imageUri!!)
+                                },
+
                             )
-                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
@@ -209,9 +230,20 @@ fun EditScreen(
                     maxLine = 3
                 )
             }
-            if (viewModel.state.isLoading){
+            if (viewModel.state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Center))
             }
         }
     }
+    ImagePickerPermissionChecker(
+        coroutineScope,
+        bottomSheetState,
+        onCameraLaunchResult = { uri ->
+            imageUri = uri
+        },
+        onGalleryLaunchResult = { uri ->
+            imageUri = uri
+        }
+    )
+
 }
