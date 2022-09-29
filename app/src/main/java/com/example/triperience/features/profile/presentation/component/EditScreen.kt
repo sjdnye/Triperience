@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,18 +12,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.CancelPresentation
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.FreeCancellation
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -38,14 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.R
-import com.example.triperience.features.authentication.presentation.component.CustomTextField
 import com.example.triperience.features.authentication.presentation.component.CustomTextField2
-import com.example.triperience.features.profile.presentation.ProfileScreenUiEvent
 import com.example.triperience.features.profile.presentation.ProfileViewModel
 import com.example.triperience.utils.common.ImagePickerPermissionChecker
+import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.spec.DestinationStyle
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
@@ -77,8 +69,8 @@ fun EditScreen(
     LaunchedEffect(key1 = true) {
         viewModel.profileEventFlow.collect {
             when (it) {
-                is ProfileScreenUiEvent.ShowMessage -> {
-                    if (it.showToast) {
+                is ScreenUiEvent.ShowMessage -> {
+                    if (it.isToast) {
                         Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                         navigator.popBackStack()
                     } else {
@@ -87,13 +79,20 @@ fun EditScreen(
                         )
                     }
                 }
-                else -> {}
             }
         }
     }
 
     Scaffold(
         scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = it) { data ->
+                Snackbar(
+                    backgroundColor = MaterialTheme.colors.primary,
+                    snackbarData = data
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -143,7 +142,6 @@ fun EditScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
                 Image(
@@ -245,5 +243,4 @@ fun EditScreen(
             imageUri = uri
         }
     )
-
 }

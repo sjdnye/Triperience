@@ -1,14 +1,17 @@
 package com.example.triperience.features.profile.presentation.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.triperience.R
@@ -39,6 +42,10 @@ fun CoilImage(
                 .fillMaxSize()
                 .clip(CircleShape)
                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                .border(
+                    width = 0.4.dp,
+                    color = MaterialTheme.colors.onBackground
+                )
             ,
             painter = painter,
             contentDescription = "profile image",

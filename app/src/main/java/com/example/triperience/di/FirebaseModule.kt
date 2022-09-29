@@ -3,7 +3,11 @@ package com.example.triperience.di
 import com.example.triperience.features.authentication.data.repository.AuthRepositoryImpl
 import com.example.triperience.features.profile.data.repository.ProfileRepositoryImpl
 import com.example.triperience.features.authentication.domain.repository.AuthRepository
+import com.example.triperience.features.profile.data.repository.UploadPostRepositoryImpl
 import com.example.triperience.features.profile.domain.repository.ProfileRepository
+import com.example.triperience.features.profile.domain.repository.UploadPostRepository
+import com.example.triperience.features.search.data.repository.SearchRepositoryImpl
+import com.example.triperience.features.search.domain.repository.SearchRepository
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -60,6 +64,23 @@ object FirebaseModule {
             firebaseStorage = firebaseStorage,
             firestore = firestore,
             auth = auth
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideUploadPostRepository(firebaseStorage: FirebaseStorage, firestore: FirebaseFirestore): UploadPostRepository{
+        return UploadPostRepositoryImpl(
+            firestore = firestore,
+            firebaseStorage = firebaseStorage
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideSearchRepository(firestore: FirebaseFirestore) : SearchRepository{
+        return SearchRepositoryImpl(
+            firestore = firestore
         )
     }
 }

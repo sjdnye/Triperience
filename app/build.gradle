@@ -134,8 +134,6 @@ dependencies {
     //kotlin extension and coroutine support for room
     implementation "androidx.room:room-ktx:2.4.2"
 
-
-
     //Accompanist
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
@@ -143,4 +141,11 @@ dependencies {
 
     //coil dependency
     implementation("io.coil-kt:coil-compose:2.2.0")
+
+    //flowRow
+    implementation "com.google.accompanist:accompanist-flowlayout:0.17.0"
+
+    // Location Services
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+
 }

@@ -118,9 +118,7 @@ class AuthViewModel @Inject constructor(
                     else -> {}
                 }
             }
-
         }
-
     }
 
     private fun login(email: String, password: String) {

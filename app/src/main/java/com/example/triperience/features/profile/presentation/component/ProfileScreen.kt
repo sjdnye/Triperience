@@ -2,13 +2,8 @@ package com.example.triperience.features.profile.presentation.component
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,42 +15,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.Start
-import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.compose.ImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
-import com.example.triperience.R
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
 import com.example.triperience.features.destinations.EditScreenDestination
-import com.example.triperience.features.destinations.ProfileScreenDestination
-import com.example.triperience.features.profile.presentation.ProfileScreenUiEvent
+import com.example.triperience.features.destinations.UploadPostScreenDestination
 import com.example.triperience.features.profile.presentation.ProfileViewModel
-import com.example.triperience.features.profile.presentation.component.CoilImage
-import com.example.triperience.features.profile.presentation.component.CustomBottomSheet
-import com.example.triperience.ui.theme.LightBlue900
+import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -77,47 +56,59 @@ fun ProfileScreen(
     )
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = true){
-        profileViewModel.profileEventFlow.collect{
-            when(it){
-                is ProfileScreenUiEvent.ShowMessage -> {
-                    if (it.showToast){
-                        Toast.makeText(context,it.message, Toast.LENGTH_LONG).show()
-                    }else{
+    LaunchedEffect(key1 = true) {
+        profileViewModel.profileEventFlow.collect {
+            when (it) {
+                is ScreenUiEvent.ShowMessage -> {
+                    if (it.isToast) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    } else {
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = it.message
                         )
                     }
                 }
-                else -> {}
+
             }
         }
     }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = it) { data ->
+                Snackbar(
+                    backgroundColor = MaterialTheme.colors.primary,
+                    snackbarData = data
+                )
+            }
+        },
         sheetContent = {
             CustomBottomSheet(
                 onClick = {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.collapse()
+                    }
                     when (it) {
-                        0 -> {
-                            Toast.makeText(context, "upload a post", Toast.LENGTH_LONG).show()
+                        "upload" -> {
+                            navigator.navigate(UploadPostScreenDestination)
                         }
-                        1 -> {
+                        "edit" -> {
                             //go to EditProfileScreen
-                            scope.launch {
-                                scaffoldState.bottomSheetState.collapse()
-                            }
                             navigator.navigate(EditScreenDestination)
+
+                        }
+                        "out" -> {
+                            profileViewModel.showDialog = true
 
                         }
                     }
                 },
             )
-
         },
         sheetBackgroundColor = MaterialTheme.colors.background,
         sheetPeekHeight = 0.dp,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         topBar = {
             TopAppBar(
                 title = {},
@@ -125,7 +116,7 @@ fun ProfileScreen(
                     IconButton(
                         onClick = {
                             scope.launch {
-                                if(sheetState.isCollapsed) {
+                                if (sheetState.isCollapsed) {
                                     sheetState.expand()
                                 } else {
                                     sheetState.collapse()
@@ -142,8 +133,9 @@ fun ProfileScreen(
                 backgroundColor = MaterialTheme.colors.background,
                 elevation = 0.dp
             )
-        }
-    ) {
+        },
+
+        ) {
         Box(modifier = Modifier.fillMaxSize()) {
             profileViewModel.state.user?.let { user ->
                 Column(
@@ -180,12 +172,29 @@ fun ProfileScreen(
                     )
                 }
             }
+            if (profileViewModel.showDialog) {
+                SimpleAlertDialog(
+                    modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                    onDismissRequest = {
+                        profileViewModel.showDialog = false
+                    },
+                    confirmButton = {
+                        profileViewModel.showDialog = false
+                        FirebaseAuth.getInstance().signOut()
+                        navigator.popBackStack()
+                        navigator.navigate(AuthWelcomeScreenDestination)
 
-
+                    },
+                    dismissButton = {
+                        profileViewModel.showDialog = false
+                    }
+                )
+            }
 
             if (profileViewModel.state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+
         }
     }
 
@@ -209,7 +218,7 @@ fun ProfileHeader(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(3.5f),
+                    .weight(5f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -230,12 +239,12 @@ fun ProfileHeader(
                 Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .weight(1f),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
-                        text = "${user.following.size.toString()} following",
+                        text = "${user.following.size} following",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Bold
@@ -243,9 +252,8 @@ fun ProfileHeader(
                         textAlign = TextAlign.Start,
                         modifier = Modifier.align(Bottom)
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = "${user.followers.size.toString()} followers",
+                        text = "${user.followers.size} followers",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Bold
@@ -255,23 +263,25 @@ fun ProfileHeader(
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(4.dp))
             Divider(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(0.5.dp)
             )
-            Spacer(modifier = Modifier.width(5.dp))
-            if (user.bio.isNotEmpty()){
+            Spacer(modifier = Modifier.width(4.dp))
+            if (user.bio.isNotEmpty()) {
                 Text(
-                    text =user.bio,
+                    text = user.bio,
                     modifier = Modifier
                         .weight(6f),
                     maxLines = 4,
                     textAlign = TextAlign.Start,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 10.sp
                 )
-            }else{
+            } else {
                 Box(
                     modifier = Modifier
                         .weight(6f)

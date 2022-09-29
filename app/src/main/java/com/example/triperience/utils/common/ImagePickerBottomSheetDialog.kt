@@ -51,9 +51,7 @@ fun SheetContent(onPickerOptionClicked: (String) -> Unit) {
             ) {
                 Icon(imageVector = Icons.Filled.Image, contentDescription = null, tint = Color(0xFF00CD58))
             }
-
             Spacer(modifier = Modifier.height(5.dp))
-
             Text(text = "Gallery", style = MaterialTheme.typography.body1)
         }
 
@@ -68,9 +66,7 @@ fun SheetContent(onPickerOptionClicked: (String) -> Unit) {
             ) {
                 Icon(imageVector = Icons.Filled.Camera, contentDescription = null, tint = Color(0xFFFF9F42))
             }
-
             Spacer(modifier = Modifier.height(5.dp))
-
             Text(text = "Camera", style = MaterialTheme.typography.body1)
         }
     }

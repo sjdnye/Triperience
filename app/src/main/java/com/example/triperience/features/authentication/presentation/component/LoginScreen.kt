@@ -241,7 +241,9 @@ fun LoginScreen(
                     ) {
                     if (viewModel.isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(CenterVertically),
+                            modifier = Modifier
+                                .align(CenterVertically).
+                                wrapContentHeight(),
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {

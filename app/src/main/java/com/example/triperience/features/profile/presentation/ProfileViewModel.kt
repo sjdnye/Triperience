@@ -12,12 +12,12 @@ import com.example.triperience.features.authentication.domain.repository.AuthRep
 import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
+import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,13 +34,14 @@ class ProfileViewModel @Inject constructor(
         private set
 
     var meUser by mutableStateOf<User?>(null)
+    var showDialog by mutableStateOf(false)
 
 
     var mainButtonText by mutableStateOf("")
     var mainButtonIsLoading by mutableStateOf(false)
 
-    private val _profileEventFlow = MutableSharedFlow<ProfileScreenUiEvent>()
-    val profileEventFlow: SharedFlow<ProfileScreenUiEvent> = _profileEventFlow
+    private val _profileEventFlow = MutableSharedFlow<ScreenUiEvent>()
+    val profileEventFlow: SharedFlow<ScreenUiEvent> = _profileEventFlow
 
     init {
         meUser = sharedPrefUtil.getCurrentUser()
@@ -65,7 +66,7 @@ class ProfileViewModel @Inject constructor(
                     }
                     is Resource.Error -> {
                         state = state.copy(isLoading = false, error = result.message.toString())
-                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = result.message.toString()))
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
                     }
                     is Resource.Loading -> {
                         state = state.copy(isLoading = true)
@@ -77,7 +78,7 @@ class ProfileViewModel @Inject constructor(
 
     fun setUserInformation(username: String, bio: String) {
         if (username.isBlank()) {
-            sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = "UserName can not be empty"))
+            sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "UserName can not be empty"))
         } else {
             viewModelScope.launch {
                 state = state.copy(isLoading = true)
@@ -94,9 +95,9 @@ class ProfileViewModel @Inject constructor(
                                         is Resource.Success -> {
                                             state = state.copy(isLoading = false)
                                             sendProfileUiEvent(
-                                                ProfileScreenUiEvent.ShowMessage(
+                                                ScreenUiEvent.ShowMessage(
                                                     message = "Profile updated successfully!",
-                                                    showToast = true
+                                                    isToast = true
                                                 )
                                             )
 
@@ -104,7 +105,7 @@ class ProfileViewModel @Inject constructor(
                                         is Resource.Error -> {
                                             state = state.copy(isLoading = false)
                                             sendProfileUiEvent(
-                                                ProfileScreenUiEvent.ShowMessage(
+                                                ScreenUiEvent.ShowMessage(
                                                     message = result.message.toString()
                                                 )
                                             )
@@ -117,13 +118,13 @@ class ProfileViewModel @Inject constructor(
 
                             } else {
                                 state = state.copy(isLoading = false)
-                                sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = "This username is already exists!"))
+                                sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "This username is already exists!"))
                             }
 
                         }
                         is Resource.Error -> {
                             state = state.copy(isLoading = false)
-                            sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = response.message.toString()))
+                            sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = response.message.toString()))
                         }
                         else -> {}
                     }
@@ -139,12 +140,12 @@ class ProfileViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         state = state.copy(isLoading = false)
-                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = "Profile image changed successfully", showToast = true))
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Profile image changed successfully", isToast = true))
                     }
                     is Resource.Error -> {
                         state = state.copy(isLoading = false)
                         sendProfileUiEvent(
-                            ProfileScreenUiEvent.ShowMessage(
+                            ScreenUiEvent.ShowMessage(
                                 message = result.message.toString(),
                             )
                         )
@@ -171,11 +172,11 @@ class ProfileViewModel @Inject constructor(
                         meUser = meUser!!.copy(following = myFollowing)
                         sharedPrefUtil.saveCurrentUser(meUser?.copy(following = myFollowing))
                         sharedPrefUtil.saveCurrentUser(meUser)
-                        mainButtonText = "following"
+                        mainButtonText = Constants.FOLLOWING_USER_TEXT
                     }
                     is Resource.Error -> {
                         mainButtonIsLoading = false
-                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = result.message.toString()))
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
                     }
                     is Resource.Loading -> {
                         mainButtonIsLoading = true
@@ -199,11 +200,11 @@ class ProfileViewModel @Inject constructor(
                         meUser = meUser!!.copy(following = myFollowing)
                         sharedPrefUtil.saveCurrentUser(meUser?.copy(following = myFollowing))
                         sharedPrefUtil.saveCurrentUser(meUser)
-                        mainButtonText = "follow"
+                        mainButtonText = Constants.FOLLOW_USER_TEXT
                     }
                     is Resource.Error -> {
                         mainButtonIsLoading = false
-                        sendProfileUiEvent(ProfileScreenUiEvent.ShowMessage(message = result.message.toString()))
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
                     }
                     is Resource.Loading -> {
                         mainButtonIsLoading = true
@@ -213,7 +214,8 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun sendProfileUiEvent(profileScreenUiEvent: ProfileScreenUiEvent) {
+
+    private fun sendProfileUiEvent(profileScreenUiEvent: ScreenUiEvent) {
         viewModelScope.launch {
             _profileEventFlow.emit(profileScreenUiEvent)
         }
