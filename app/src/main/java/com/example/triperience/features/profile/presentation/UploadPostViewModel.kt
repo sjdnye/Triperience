@@ -30,7 +30,7 @@ class UploadPostViewModel @Inject constructor(
     var longitude by mutableStateOf<Double?>(null)
     var description by mutableStateOf<String>("")
     var category by mutableStateOf<PostCategory>(PostCategory.Idle)
-    var score by mutableStateOf<Int?>(null)
+    var score by mutableStateOf<String>("")
     var imageUri by mutableStateOf<Uri?>(null)
 
     var isLoading by mutableStateOf(false)
@@ -47,7 +47,14 @@ class UploadPostViewModel @Inject constructor(
                         latitude = latitude!!,
                         longitude = longitude!!,
                         description = description,
-                        postCategory = category,
+                        postCategory = when (category) {
+                            PostCategory.Sea -> "Sea"
+                            PostCategory.Jungle -> "Jungle"
+                            PostCategory.Mountainous -> "Mountain"
+                            PostCategory.Desert -> "Desert"
+                            PostCategory.City -> "City"
+                            else -> "Idle"
+                        },
                         score = score,
                         publisher = sharedPrefUtil.getCurrentUser()?.userid!!
                     )

@@ -38,7 +38,6 @@ fun TripCategoryItem(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
-//            .padding(10.dp)
             .clickable {
                 onClick()
             }
@@ -46,20 +45,13 @@ fun TripCategoryItem(
     ) {
         Image(
             modifier = Modifier
-                .size(32.dp)
+                .size(64.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .align(Alignment.Center),
             painter = painterResource(id = painter),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(color = if (isSelected) Color.Transparent else Color.DarkGray),
-
+            colorFilter = (if (isSelected) null else Color.LightGray)?.let { ColorFilter.tint(color = it) },
             )
-//        Box(
-//            modifier = modifier
-//                .clip(RoundedCornerShape(20.dp))
-//                .padding(10.dp)
-//                .background(if (isSelected) Color.Transparent else Color.DarkGray)
-//        )
     }
 }

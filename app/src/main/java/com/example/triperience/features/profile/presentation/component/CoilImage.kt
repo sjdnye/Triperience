@@ -42,10 +42,6 @@ fun CoilImage(
                 .fillMaxSize()
                 .clip(CircleShape)
                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
-                .border(
-                    width = 0.4.dp,
-                    color = MaterialTheme.colors.onBackground
-                )
             ,
             painter = painter,
             contentDescription = "profile image",

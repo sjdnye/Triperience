@@ -218,7 +218,7 @@ fun ProfileHeader(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(5f),
+                    .weight(3.5f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -241,13 +241,14 @@ fun ProfileHeader(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(
                         text = "${user.following.size} following",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
                         ),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.align(Bottom)
@@ -256,14 +257,15 @@ fun ProfileHeader(
                         text = "${user.followers.size} followers",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
                         ),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.align(Bottom)
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(4.dp))
+//            Spacer(modifier = Modifier.width(2.dp))
             Divider(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier

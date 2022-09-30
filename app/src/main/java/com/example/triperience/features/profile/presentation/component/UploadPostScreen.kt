@@ -20,8 +20,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -78,6 +81,8 @@ fun UploadPostScreen(
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
 
     val showLocationPermissionRationale = remember { mutableStateOf(ShowRationale()) }
+
+    val scoreOption = listOf(1,2,3,4,5,6,7,8,9,10).map { it.toString() }
 
 
     LaunchedEffect(key1 = true) {
@@ -131,25 +136,22 @@ fun UploadPostScreen(
         ) {
             Column(
                 modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState()),
             ) {
-                Box(
+
+                Image(
+                    painter = if (viewModel.imageUri == null) {
+                        painterResource(id = R.drawable.broken_image)
+                    } else rememberAsyncImagePainter(model = Uri.parse(viewModel.imageUri.toString())),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(2f),
-                    contentAlignment = Center
-                ) {
-                    Image(
-                        painter = if (viewModel.imageUri == null) {
-                            painterResource(id = R.drawable.broken_image)
-                        } else rememberAsyncImagePainter(model = Uri.parse(viewModel.imageUri.toString())),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-                Spacer(modifier = Modifier.height(5.dp))
+                        .height(400.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Select a photo",
                     color = MaterialTheme.colors.primary,
@@ -163,186 +165,213 @@ fun UploadPostScreen(
                         }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-//                CustomTextField2(
-//                    modifier = Modifier,
-//                    value = viewModel.description,
-//                    onValueChange = {
-//                        viewModel.description = it
-//                    },
-//                    label = "Caption",
-//                    placeholder = "Enter your description here",
-//                    keyboardOptions = KeyboardOptions(
-//                        keyboardType = KeyboardType.Text,
-//                        imeAction = ImeAction.Done
-//                    ),
-//                    keyboardActions = KeyboardActions(
-//                        onDone = {
-//                            focusManager.clearFocus()
-//                            keyboardController?.hide()
-//                        }
-//                    ),
-//                    maxLine = 4
-//                )
-//                Spacer(modifier = Modifier.height(5.dp))
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    //Location
-//                    Text(
-//                        text = "Auto",
-//                        color = MaterialTheme.colors.primary,
-//                        modifier = Modifier
-//                            .weight(0.5f)
-//                            .clickable {
-//                                if (locationCoarsePermission.status.isGranted && locationFinePermission.status.isGranted) {
-//                                    viewModel.getCurrentLocation()
-//                                } else if (locationCoarsePermission.status.shouldShowRationale || locationFinePermission.status.shouldShowRationale) {
-//                                    showLocationPermissionRationale.value =
-//                                        showLocationPermissionRationale.value.copy(
-//                                            showDialog = true,
-//                                            message = "Triperience Requires this location permission to access coordinates of your situation.",
-//                                            imageVector = Icons.Filled.MyLocation,
-//                                            permission = Constants.LOCATION
-//                                        )
-//                                } else {
-//                                    locationCoarsePermission.launchPermissionRequest()
-//                                    locationFinePermission.launchPermissionRequest()
-//                                }
-//                            }
-//                    )
-//                    Text(
-//                        text = viewModel.latitude.toString(),
-//                        modifier = Modifier.weight(1f)
-//                    )
-//                    Text(
-//                        text = viewModel.longitude.toString(),
-//                        modifier = Modifier.weight(1f)
-//                    )
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                )
+                CustomTextField2(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.description,
+                    onValueChange = {
+                        viewModel.description = it
+                    },
+                    label = "Caption",
+                    placeholder = "Enter your description here",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                        }
+                    ),
+                    maxLine = 4
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                )
+                Text(
+                    text = "Location:",
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Thin
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    //Location
+                    Text(
+                        text = "Auto",
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .clickable {
+                                if (locationCoarsePermission.status.isGranted && locationFinePermission.status.isGranted) {
+                                    viewModel.getCurrentLocation()
+                                } else if (locationCoarsePermission.status.shouldShowRationale || locationFinePermission.status.shouldShowRationale) {
+                                    showLocationPermissionRationale.value =
+                                        showLocationPermissionRationale.value.copy(
+                                            showDialog = true,
+                                            message = "Triperience Requires this geoLocation permission to access your location.",
+                                            imageVector = Icons.Filled.MyLocation,
+                                            permission = Constants.LOCATION
+                                        )
+                                } else {
+                                    locationCoarsePermission.launchPermissionRequest()
+                                    locationFinePermission.launchPermissionRequest()
+                                }
+                            }
+                    )
+                    Text(
+                        text = if(viewModel.latitude == null){"latitude"} else viewModel.latitude.toString(),
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Thin
+
+                    )
+                    Text(
+                        text = if(viewModel.longitude == null){"longitude"} else viewModel.longitude.toString(),
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Thin
+                    )
                 }
-//                Spacer(modifier = Modifier.height(5.dp))
-//                Divider(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(5.dp)
-//                )
-//                Text(
-//                    text = "Category :",
-//                    textAlign = TextAlign.Start,
-//                    modifier = Modifier.padding(5.dp)
-//                )
-//                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                )
+                Text(
+                    text = "Category:",
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Thin
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                FlowRow(
+                    mainAxisSpacing = 10.dp,
+                    crossAxisSpacing = 10.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TripCategoryItem(
+                        modifier = Modifier,
+                        painter = R.drawable.sea,
+                        isSelected = viewModel.category == PostCategory.Sea,
+                        onClick = {
+                            viewModel.category = PostCategory.Sea
 
-//                FlowRow(
-//                    mainAxisSpacing = 10.dp,
-//                    crossAxisSpacing = 10.dp,
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    TripCategoryItem(
-//                        modifier = Modifier,
-//                        painter = R.drawable.sea,
-//                        isSelected = viewModel.category == PostCategory.Sea,
-//                        onClick = {
-//                            viewModel.category = PostCategory.Sea
-//
-//                        }
-//                    )
-//                    TripCategoryItem(
-//                        modifier = Modifier,
-//                        painter = R.drawable.forest,
-//                        isSelected = viewModel.category == PostCategory.Jungle,
-//                        onClick = {
-//                            viewModel.category = PostCategory.Jungle
-//                        }
-//                    )
-//                    TripCategoryItem(
-//                        modifier = Modifier,
-//                        painter = R.drawable.mountain,
-//                        isSelected = viewModel.category == PostCategory.Mountainous,
-//                        onClick = {
-//                            viewModel.category = PostCategory.Mountainous
-//                        }
-//                    )
-//                    TripCategoryItem(
-//                        modifier = Modifier,
-//                        painter = R.drawable.desert,
-//                        isSelected = viewModel.category == PostCategory.Desert,
-//                        onClick = {
-//                            viewModel.category = PostCategory.Desert
-//                        }
-//                    )
-//                    TripCategoryItem(
-//                        modifier = Modifier,
-//                        painter = R.drawable.city,
-//                        isSelected = viewModel.category == PostCategory.City,
-//                        onClick = {
-//                            viewModel.category = PostCategory.City
-//                        }
-//                    )
-//                }
+                        }
+                    )
+                    TripCategoryItem(
+                        modifier = Modifier,
+                        painter = R.drawable.forest,
+                        isSelected = viewModel.category == PostCategory.Jungle,
+                        onClick = {
+                            viewModel.category = PostCategory.Jungle
+                        }
+                    )
+                    TripCategoryItem(
+                        modifier = Modifier,
+                        painter = R.drawable.mountain,
+                        isSelected = viewModel.category == PostCategory.Mountainous,
+                        onClick = {
+                            viewModel.category = PostCategory.Mountainous
+                        }
+                    )
+                    TripCategoryItem(
+                        modifier = Modifier,
+                        painter = R.drawable.desert,
+                        isSelected = viewModel.category == PostCategory.Desert,
+                        onClick = {
+                            viewModel.category = PostCategory.Desert
+                        }
+                    )
+                    TripCategoryItem(
+                        modifier = Modifier,
+                        painter = R.drawable.city,
+                        isSelected = viewModel.category == PostCategory.City,
+                        onClick = {
+                            viewModel.category = PostCategory.City
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = CenterVertically
+                ) {
+                    Text(
+                        text = "Score: ",
+                        fontWeight = FontWeight.Thin
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    CustomExposedDropDownMenu(
+                        modifier = Modifier,
+                        options = scoreOption,
+                        onClick = {
+                            viewModel.score = it
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.uploadPost()
+                    }
+                ) {
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .wrapContentHeight(),
+                            color = MaterialTheme.colors.onPrimary
+                        )
+                    } else {
+                        Text(
+                            text = "Upload",
+                            color = MaterialTheme.colors.onPrimary
+                        )
+                    }
+                }
 
-//                Spacer(modifier = Modifier.height(5.dp))
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                ) {
-//                    Text(text = "Score: ")
-//                    Spacer(modifier = Modifier.width(10.dp))
-//                    CustomExposedDropDownMenu(
-//                        modifier = Modifier,
-//                        options = (1..10).forEach { it.toString() } as MutableList<String>,
-//                        onClick = {
-//
-//                        }
-//                    )
-//
-//                }
-//                Spacer(modifier = Modifier.height(10.dp))
-//
-//                Button(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    shape = RoundedCornerShape(1.dp),
-//                    onClick = {
-//                        keyboardController?.hide()
-//                        viewModel.uploadPost()
-//                    }
-//                ) {
-//                    if (viewModel.isLoading) {
-//                        CircularProgressIndicator(
-//                            modifier = Modifier
-//                                .align(Alignment.CenterVertically)
-//                                .wrapContentHeight(),
-//                            color = MaterialTheme.colors.onPrimary
-//                        )
-//                    } else {
-//                        Text(
-//                            text = "Upload",
-//                            color = MaterialTheme.colors.onPrimary
-//                        )
-//                    }
-//                }
-//            }
-//            if (showLocationPermissionRationale.value.showDialog) {
-//                PermissionRationaleDialog(
-//                    message = showLocationPermissionRationale.value.message,
-//                    imageVector = showLocationPermissionRationale.value.imageVector!!,
-//                    onRequestPermission = {
-//                        showLocationPermissionRationale.value =
-//                            showLocationPermissionRationale.value.copy(showDialog = false)
-//                        when (showLocationPermissionRationale.value.permission) {
-//                            Constants.LOCATION -> {
-//                                locationCoarsePermission.launchPermissionRequest()
-//                                locationFinePermission.launchPermissionRequest()
-//                            }
-//                        }
-//                    }
-//                ) {
-//                    showLocationPermissionRationale.value =
-//                        showLocationPermissionRationale.value.copy(showDialog = false)
-//                }
-//            }
+            }
+
+            if (showLocationPermissionRationale.value.showDialog) {
+                PermissionRationaleDialog(
+                    message = showLocationPermissionRationale.value.message,
+                    imageVector = showLocationPermissionRationale.value.imageVector!!,
+                    onRequestPermission = {
+                        showLocationPermissionRationale.value =
+                            showLocationPermissionRationale.value.copy(showDialog = false)
+                        when (showLocationPermissionRationale.value.permission) {
+                            Constants.LOCATION -> {
+                                locationCoarsePermission.launchPermissionRequest()
+                                locationFinePermission.launchPermissionRequest()
+                            }
+                        }
+                    }
+                ) {
+                    showLocationPermissionRationale.value =
+                        showLocationPermissionRationale.value.copy(showDialog = false)
+                }
+            }
         }
     }
 

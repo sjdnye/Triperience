@@ -6,8 +6,8 @@ data class Post(
     var postImage: String = "",
     val description: String = "",
     val publisher: String = "",
-    val postCategory: PostCategory = PostCategory.Idle,
-    val score : Int? = null,
+    val postCategory: String = "Idle",
+    val score : String = "",
     val latitude : Double? = null,
     val longitude : Double? = null,
     var dateTime: Long? = null
