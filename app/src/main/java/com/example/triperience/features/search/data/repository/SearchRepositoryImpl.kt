@@ -22,8 +22,8 @@ class SearchRepositoryImpl @Inject constructor(
                 .whereEqualTo(Constants.USER_USERNAME, query)
                 .get()
                 .await()
-            val result = query.toObjects(User::class.java)
-            Resource.Success(data = result)
+            val result : List<User> = query.toObjects(User::class.java)
+            emit(Resource.Success(data = result))
 
         }catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))

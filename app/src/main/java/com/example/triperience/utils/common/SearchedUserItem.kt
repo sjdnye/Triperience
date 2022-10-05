@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.features.authentication.domain.model.User
@@ -31,10 +33,12 @@ fun SearchedUserItem(
             contentDescription = null,
             modifier = Modifier
                 .clip(CircleShape)
-                .size(64.dp),
+                .size(32.dp),
             contentScale = ContentScale.Crop,
         )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(text = user.username)
+        Spacer(modifier = Modifier.width(5.dp))
+        Box(modifier = Modifier.wrapContentHeight().fillMaxWidth(), contentAlignment = Alignment.BottomStart){
+            Text(text = user.username, textAlign = TextAlign.Justify)
+        }
     }
 }

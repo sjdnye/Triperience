@@ -16,16 +16,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.component.AuthWelcomeScreen
 import com.example.triperience.features.authentication.presentation.component.CustomTextField
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.UserProfileScreenDestination
+import com.example.triperience.ui.theme.*
 import com.example.triperience.utils.common.SearchedUserItem
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
@@ -44,6 +54,7 @@ fun SearchScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
+
     var searchQuery by remember {
         mutableStateOf("")
     }
@@ -54,14 +65,11 @@ fun SearchScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(
-                        rememberScrollState()
-                    )
             ) {
                 CustomTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -70,8 +78,8 @@ fun SearchScreen(
                         searchQuery = it
                         searchScreenViewModel.searchUsers(searchQuery)
                     },
-                    label = "",
-                    placeholder = "Search...",
+                    label = "Search",
+                    placeholder = "",
                     leadingIcon = Icons.Default.Search,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
@@ -85,23 +93,28 @@ fun SearchScreen(
                     )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                if (searchQuery.isEmpty()) {
+                if (searchQuery != "") {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(searchScreenViewModel.users) { user ->
                             SearchedUserItem(
                                 user = user,
                                 onClick = {
-                                    TODO("navigate to UserProfileScreen")
+                                    navigator.navigate(UserProfileScreenDestination(userId = user.userid))
                                 }
                             )
                         }
                     }
-
                 } else {
-                    TODO("Show different categories")
-
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(
+                                rememberScrollState()
+                            )
+                    ) {
+                        CardSection()
+                    }
                 }
-
             }
             if (searchScreenViewModel.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -113,17 +126,131 @@ fun SearchScreen(
 @Composable
 fun CategoryCardItem(
     modifier: Modifier = Modifier,
-    imageVector: ImageVector,
+    painter: Painter,
+    gradiant: Brush,
+    title: String
 ) {
-    Box(
-        modifier = modifier,
+    Card(
+        modifier = modifier
+            .background(MaterialTheme.colors.background)
+            .clip(RoundedCornerShape(20.dp))
+            .wrapContentHeight(),
     ) {
-        Image(
-            imageVector = imageVector,
-            contentDescription = "",
+        Box(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
+                .background(Color.Transparent)
+                .clip(RoundedCornerShape(20.dp))
+                .background(gradiant),
+
+            ) {
+            Text(
+                text = title,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(5.dp),
+                color = MaterialTheme.colors.onPrimary,
+                fontSize = 20.sp,
+                fontFamily = customFont
+            )
+            Image(
+                painter = painter,
+                contentDescription = "",
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(128.dp)
+                    .clip(RoundedCornerShape(20.dp))
+            )
+        }
+
+    }
+}
+
+@Composable
+fun CardSection() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(20.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CategoryCardItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+
+                },
+            painter = painterResource(id = R.drawable.sea),
+            gradiant = Brush.horizontalGradient(
+                colors = listOf(
+                    LightBlue800,
+                    LightBlue100
+                )
+            ),
+            title = "Sea"
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        CategoryCardItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+
+                },
+            painter = painterResource(id = R.drawable.forest),
+            gradiant = Brush.horizontalGradient(
+                colors = listOf(
+                    LightGreen900,
+                    LightGreen100
+                )
+            ),
+            title = "Jungle"
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        CategoryCardItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+
+                },
+            painter = painterResource(id = R.drawable.mountain),
+            gradiant = Brush.horizontalGradient(
+                colors = listOf(
+                    BlueGray800,
+                    BlueGray100
+                )
+            ),
+            title = "Mountain"
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        CategoryCardItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+
+                },
+            painter = painterResource(id = R.drawable.desert),
+            gradiant = Brush.horizontalGradient(
+                colors = listOf(
+                    LightYellow800,
+                    LightYellow100
+                )
+            ),
+            title = "Desert"
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        CategoryCardItem(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+
+                },
+            painter = painterResource(id = R.drawable.city),
+            gradiant = Brush.horizontalGradient(
+                colors = listOf(
+                    LightPink800,
+                    LightPink100
+                )
+            ),
+            title = "City"
         )
     }
 }

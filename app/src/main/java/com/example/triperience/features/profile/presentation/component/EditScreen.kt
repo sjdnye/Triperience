@@ -96,10 +96,15 @@ fun EditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Edit Profile",
-                        textAlign = TextAlign.Center,
-                    )
+                   Row(
+                       modifier = Modifier.fillMaxWidth(),
+                       horizontalArrangement = Arrangement.Center
+                   ) {
+                       Text(
+                           text = "Edit Profile",
+                           textAlign = TextAlign.Center,
+                       )
+                   }
                 },
                 backgroundColor = MaterialTheme.colors.background,
                 contentColor = MaterialTheme.colors.primary,
@@ -107,11 +112,14 @@ fun EditScreen(
                     IconButton(
                         onClick = {
                             navigator.popBackStack()
-                        }
+                        },
+                        modifier = Modifier.wrapContentHeight()
+
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Cancel,
-                            contentDescription = "Cancel"
+                            painter = painterResource(id = R.drawable.cross_icon_18),
+                            contentDescription = "Cancel",
+                            tint = MaterialTheme.colors.primary,
                         )
                     }
                 },
@@ -121,11 +129,13 @@ fun EditScreen(
                             keyboardController?.hide()
                             viewModel.setUserInformation(username = username, bio = bio)
 
-                        }
+                        },
+                        modifier = Modifier.wrapContentHeight()
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Accept changes"
+                            painter = painterResource(id = R.drawable.check_icon_18),
+                            contentDescription = "Accept changes",
+                            tint = MaterialTheme.colors.primary
                         )
                     }
                 },

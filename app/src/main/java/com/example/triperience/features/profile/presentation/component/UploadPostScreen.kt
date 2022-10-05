@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -25,6 +27,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -142,14 +145,15 @@ fun UploadPostScreen(
 
                 Image(
                     painter = if (viewModel.imageUri == null) {
-                        painterResource(id = R.drawable.broken_image)
+                        painterResource(id = R.drawable.default_icon_white)
                     } else rememberAsyncImagePainter(model = Uri.parse(viewModel.imageUri.toString())),
                     contentDescription = "",
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(400.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(10.dp)),
+                    colorFilter = if (viewModel.imageUri == null) ColorFilter.tint(MaterialTheme.colors.onBackground) else null
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -168,7 +172,6 @@ fun UploadPostScreen(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
                 )
                 CustomTextField2(
                     modifier = Modifier.fillMaxWidth(),
@@ -194,7 +197,6 @@ fun UploadPostScreen(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
                 )
                 Text(
                     text = "Location:",
@@ -246,7 +248,6 @@ fun UploadPostScreen(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
                 )
                 Text(
                     text = "Category:",
@@ -305,7 +306,6 @@ fun UploadPostScreen(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
                 )
                 Row(
                     modifier = Modifier
@@ -315,7 +315,9 @@ fun UploadPostScreen(
                 ) {
                     Text(
                         text = "Score: ",
-                        fontWeight = FontWeight.Thin
+                        fontWeight = FontWeight.Thin,
+                        modifier = Modifier
+                            .align(Bottom)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     CustomExposedDropDownMenu(

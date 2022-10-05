@@ -53,7 +53,7 @@ class ProfileViewModel @Inject constructor(
     }
 
 
-    fun getUserInformation(userId: String) {
+   private fun getUserInformation(userId: String) {
         viewModelScope.launch {
             profileRepository.getUserInformation(userid = userId).collect{ result ->
                 when (result) {

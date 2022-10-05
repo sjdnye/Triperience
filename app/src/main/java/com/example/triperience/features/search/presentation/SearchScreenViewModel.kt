@@ -34,9 +34,10 @@ class SearchScreenViewModel @Inject constructor(
     var job: Job? = null
 
     fun searchUsers(query: String) {
-        if (query.isEmpty()) {
+        if (query == "") {
             isLoading = false
             users = emptyList()
+            job?.cancel()
         } else {
             job?.cancel()
             job = viewModelScope.launch {
@@ -48,13 +49,13 @@ class SearchScreenViewModel @Inject constructor(
                             users = result.data as MutableList<User>
                         }
                         is Resource.Error -> {
+                            isLoading = false
                             sendScreenUiEvent(
                                 ScreenUiEvent.ShowMessage(
                                     message = result.message.toString(),
                                     isToast = false
                                 )
                             )
-                            isLoading = false
                         }
                         is Resource.Loading -> {
                             isLoading = true

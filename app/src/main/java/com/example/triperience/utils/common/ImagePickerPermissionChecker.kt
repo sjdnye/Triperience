@@ -2,9 +2,12 @@ package com.example.triperience.utils.common
 
 import android.Manifest
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
@@ -23,6 +26,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -51,12 +55,15 @@ fun ImagePickerPermissionChecker(
     )
 
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { bitmapImage ->
             run {
-                if (success) {
-                    onCameraLaunchResult(imageUri)
-                }
+               val result =  getImageUri(inContext = context, inImage = bitmapImage!!)
+                onCameraLaunchResult(result)
+//                if (success) {
+//                    onCameraLaunchResult(imageUri)
+//                }
+
             }
         }
     )
@@ -83,9 +90,10 @@ fun ImagePickerPermissionChecker(
                 coroutineScope.launch { bottomSheetState.hide() }
 
                 if (cameraPermission.status.isGranted) {
-                    val uri = ComposeFileProvider.getImageUri(context)
-                    imageUri = uri
-                    cameraLauncher.launch(uri)
+//                    val uri = ComposeFileProvider.getImageUri(context)
+//                    imageUri = uri
+//                    cameraLauncher.launch(uri)
+                    cameraLauncher.launch()
                 } else if (cameraPermission.status.shouldShowRationale) {
                     showPermissionRationale.value = showPermissionRationale.value.copy(
                         showDialog = true,
@@ -118,6 +126,13 @@ fun ImagePickerPermissionChecker(
             }
         )
     }
+}
+
+fun getImageUri(inContext: Context, inImage: Bitmap) : Uri{
+   val bytes : ByteArrayOutputStream = ByteArrayOutputStream()
+    inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+    val path : String = MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
+    return Uri.parse(path)
 }
 
 class ComposeFileProvider : FileProvider(
