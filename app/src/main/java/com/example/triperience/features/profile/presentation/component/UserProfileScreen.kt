@@ -96,6 +96,7 @@ fun UserProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(5.dp))
 
+                if (profileViewModel.isShowFollowButton){
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -125,6 +126,7 @@ fun UserProfileScreen(
                             )
                         }
                     }
+                }
 
 //                    Text(
 //                        text = "Posts: ${user.posts.size.toString()}",

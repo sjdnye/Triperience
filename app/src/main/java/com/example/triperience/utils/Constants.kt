@@ -3,6 +3,7 @@ package com.example.triperience.utils
 object Constants{
     const val COLLECTION_USERS = "users"
     const val COLLECTION_POST = "posts"
+    const val COLLECTION_COMMENTS = "comments"
 
     const val CAMERA: String = "camera"
     const val GALLERY: String = "gallery"
@@ -15,6 +16,9 @@ object Constants{
     const val CURRENT_USER: String = "currentUser"
     const val USER_USERNAME: String = "username"
     const val USER_ID: String = "userId"
+    const val POST_ID : String = "postId"
+    const val PUBLISHER_ID = "publisher"
+    const val DATE_TIME = "dateTime"
 
     const val FOLLOW_USER_TEXT = "follow"
     const val FOLLOWING_USER_TEXT = "following"

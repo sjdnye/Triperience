@@ -1,6 +1,7 @@
 package com.example.triperience.features.profile.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.example.triperience.utils.Constants
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
@@ -100,7 +102,7 @@ class ProfileRepositoryImpl @Inject constructor(
             emit(Resource.Loading())
             firestore.collection(Constants.COLLECTION_USERS)
                 .document(myId)
-                .update("following",FieldValue.arrayUnion(userid))
+                .update("following", FieldValue.arrayUnion(userid))
                 .await()
 
             firestore.collection(Constants.COLLECTION_USERS)

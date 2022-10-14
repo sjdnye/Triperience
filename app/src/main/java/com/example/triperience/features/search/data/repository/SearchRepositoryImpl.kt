@@ -19,9 +19,12 @@ class SearchRepositoryImpl @Inject constructor(
         try {
             emit(Resource.Loading())
             val query = firestore.collection(Constants.COLLECTION_USERS)
-                .whereEqualTo(Constants.USER_USERNAME, query)
+                .orderBy(Constants.USER_USERNAME)
+                .startAt(query)
+                .endAt(query + "\uf8ff")
                 .get()
                 .await()
+
             val result : List<User> = query.toObjects(User::class.java)
             emit(Resource.Success(data = result))
 

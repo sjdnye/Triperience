@@ -1,6 +1,7 @@
 package com.example.triperience.features.profile.presentation
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,6 +38,8 @@ class ProfileViewModel @Inject constructor(
     var meUser by mutableStateOf<User?>(null)
     var showDialog by mutableStateOf(false)
 
+    var isShowFollowButton by mutableStateOf(false)
+
 
     var mainButtonText by mutableStateOf("")
     var mainButtonIsLoading by mutableStateOf(false)
@@ -46,20 +50,24 @@ class ProfileViewModel @Inject constructor(
     init {
         meUser = sharedPrefUtil.getCurrentUser()
         savedStateHandle.get<String>(Constants.USER_ID)?.let {
+            if (meUser?.userid!! != it){
+                isShowFollowButton = true
+            }
             getUserInformation(it)
-            mainButtonText = if (meUser?.following?.contains(state.user?.userid.toString()) == true) "following" else "follow"
+            mainButtonText =
+                if (meUser?.following!!.contains(it)) "following" else "follow"
         } ?: meUser?.userid?.let { getUserInformation(it) }
 
     }
 
 
-   private fun getUserInformation(userId: String) {
+    private fun getUserInformation(userId: String) {
         viewModelScope.launch {
-            profileRepository.getUserInformation(userid = userId).collect{ result ->
+            profileRepository.getUserInformation(userid = userId).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         state = state.copy(user = result.data, isLoading = false, error = "")
-                        if (userId == meUser?.userid.toString()) {
+                        if (userId == meUser?.userid) {
                             sharedPrefUtil.saveCurrentUser(result.data)
                             meUser = result.data
                         }
@@ -136,41 +144,46 @@ class ProfileViewModel @Inject constructor(
 
     fun uploadImageProfile(imageUrl: Uri) {
         viewModelScope.launch {
-            profileRepository.uploadProfileImage(imageUri = imageUrl,userid = meUser?.userid!!).collect { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        state = state.copy(isLoading = false)
-                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Profile image changed successfully", isToast = true))
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(isLoading = false)
-                        sendProfileUiEvent(
-                            ScreenUiEvent.ShowMessage(
-                                message = result.message.toString(),
+            profileRepository.uploadProfileImage(imageUri = imageUrl, userid = meUser?.userid!!)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            state = state.copy(isLoading = false)
+                            sendProfileUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = "Profile image changed successfully",
+                                    isToast = true
+                                )
                             )
-                        )
-                    }
-                    is Resource.Loading -> {
-                        state = state.copy(isLoading = true)
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(isLoading = false)
+                            sendProfileUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = result.message.toString(),
+                                )
+                            )
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(isLoading = true)
+                        }
                     }
                 }
-            }
         }
     }
 
     fun followUser(userid: String) {
-        val myFollowing : MutableList<String> = meUser?.following as MutableList<String>
+        val myFollowing: MutableList<String> = meUser!!.following as MutableList<String>
         viewModelScope.launch {
             profileRepository.followUser(
-                myId = meUser?.userid!!,
+                myId = meUser!!.userid,
                 userid = userid
             ).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         mainButtonIsLoading = false
                         myFollowing.add(userid)
-                        meUser = meUser!!.copy(following = myFollowing)
-                        sharedPrefUtil.saveCurrentUser(meUser?.copy(following = myFollowing))
+                        meUser = meUser?.copy(following = myFollowing)
                         sharedPrefUtil.saveCurrentUser(meUser)
                         mainButtonText = Constants.FOLLOWING_USER_TEXT
                     }
@@ -187,10 +200,10 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun unFollowUser(userid: String) {
-        val myFollowing : MutableList<String> = meUser?.following as MutableList<String>
+        val myFollowing: MutableList<String> = meUser?.following as MutableList<String>
         viewModelScope.launch {
-            profileRepository.followUser(
-                myId = meUser?.userid!!,
+            profileRepository.unFollowUser(
+                myId = meUser!!.userid,
                 userid = userid
             ).collect { result ->
                 when (result) {
@@ -198,7 +211,6 @@ class ProfileViewModel @Inject constructor(
                         mainButtonIsLoading = false
                         myFollowing.remove(userid)
                         meUser = meUser!!.copy(following = myFollowing)
-                        sharedPrefUtil.saveCurrentUser(meUser?.copy(following = myFollowing))
                         sharedPrefUtil.saveCurrentUser(meUser)
                         mainButtonText = Constants.FOLLOW_USER_TEXT
                     }

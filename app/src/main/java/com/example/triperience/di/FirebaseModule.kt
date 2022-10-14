@@ -3,6 +3,10 @@ package com.example.triperience.di
 import com.example.triperience.features.authentication.data.repository.AuthRepositoryImpl
 import com.example.triperience.features.profile.data.repository.ProfileRepositoryImpl
 import com.example.triperience.features.authentication.domain.repository.AuthRepository
+import com.example.triperience.features.comment.data.repository.CommentRepositoryImpl
+import com.example.triperience.features.comment.domain.repository.CommentRepository
+import com.example.triperience.features.home.data.repository.HomeRepositoryImpl
+import com.example.triperience.features.home.domain.repository.HomeRepository
 import com.example.triperience.features.profile.data.repository.UploadPostRepositoryImpl
 import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.example.triperience.features.profile.domain.repository.UploadPostRepository
@@ -82,5 +86,17 @@ object FirebaseModule {
         return SearchRepositoryImpl(
             firestore = firestore
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideHomeRepository(firestore: FirebaseFirestore) : HomeRepository{
+        return HomeRepositoryImpl(firestore = firestore)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCommentRepository(firestore: FirebaseFirestore) : CommentRepository{
+        return CommentRepositoryImpl(firestore = firestore)
     }
 }

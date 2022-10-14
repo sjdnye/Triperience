@@ -100,7 +100,6 @@ fun ProfileScreen(
                         }
                         "out" -> {
                             profileViewModel.showDialog = true
-
                         }
                     }
                 },

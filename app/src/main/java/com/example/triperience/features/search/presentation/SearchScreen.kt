@@ -55,6 +55,7 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
 
 
+
     var searchQuery by remember {
         mutableStateOf("")
     }
@@ -102,6 +103,7 @@ fun SearchScreen(
                                     navigator.navigate(UserProfileScreenDestination(userId = user.userid))
                                 }
                             )
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
                 } else {

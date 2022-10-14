@@ -1,4 +1,4 @@
-package com.example.triperience.features.home.presentation
+package com.example.triperience.features.home.presentation.component
 
 import androidx.compose.runtime.Composable
 
