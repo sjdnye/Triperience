@@ -106,7 +106,7 @@ fun RegisterScreen(
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
                 Snackbar(
-                    backgroundColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.onBackground,
                     snackbarData = data
                 )
             }
@@ -125,7 +125,7 @@ fun RegisterScreen(
                             }
                     )
                 },
-                contentColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onBackground,
                 elevation = 0.dp,
                 modifier = Modifier.shadow(0.dp)
             )

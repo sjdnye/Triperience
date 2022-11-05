@@ -126,10 +126,10 @@ fun UploadPostScreen(
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
                     }
                 },
-                contentColor = MaterialTheme.colors.primary,
-                elevation = 0.dp,
-                backgroundColor = MaterialTheme.colors.background
-            )
+                contentColor = MaterialTheme.colors.onBackground,
+                backgroundColor = MaterialTheme.colors.background,
+                elevation = 0.dp
+                )
         }
     ) {
         Box(

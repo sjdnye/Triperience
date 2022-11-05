@@ -10,7 +10,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 
 @Destination
 @Composable
-fun PostDetailScreen() {
+fun PostDetailScreen(
+    postId:String
+) {
 
     var selectedTabIndex by remember {
         mutableStateOf(0)

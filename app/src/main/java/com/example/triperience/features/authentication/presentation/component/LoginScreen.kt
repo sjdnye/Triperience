@@ -93,7 +93,7 @@ fun LoginScreen(
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
                 Snackbar(
-                    backgroundColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.onBackground,
                     snackbarData = data
                 )
             }
@@ -112,7 +112,7 @@ fun LoginScreen(
                             }
                     )
                 },
-                contentColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onBackground,
                 elevation = 0.dp,
                 modifier = Modifier.shadow(0.dp),
             )
@@ -242,8 +242,8 @@ fun LoginScreen(
                     if (viewModel.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .align(CenterVertically).
-                                wrapContentHeight(),
+                                .align(CenterVertically)
+                                .wrapContentHeight(),
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {

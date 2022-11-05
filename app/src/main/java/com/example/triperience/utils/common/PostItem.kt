@@ -1,18 +1,25 @@
 package com.example.triperience.utils.common
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -31,9 +38,9 @@ import kotlin.random.Random
 @Composable
 fun PostItem(
     modifier: Modifier = Modifier,
-    onProfileClick: (userId : String) -> Unit,
-    onImageClick: (postId : String) -> Unit,
-    getPublisherDetail: (publisherId: String) -> User?,
+    onProfileClick: (userId: String) -> Unit,
+    onImageClick: (postId: String) -> Unit,
+    onCommentClick: (postId: String) -> Unit,
     homeViewModel: HomeViewModel,
     post: Post
 ) {
@@ -43,24 +50,24 @@ fun PostItem(
     var userName by remember {
         mutableStateOf<String?>(null)
     }
+    val context = LocalContext.current
 
-    LaunchedEffect(key1 = true ){
-//        val publisher = getPublisherDetail(post.publisher)
+    LaunchedEffect(key1 = true) {
         val publisher = homeViewModel.getPostPublisherDetail(post.publisher)
         userProfile = publisher?.profileImage
         userName = publisher?.username
-
     }
 
     var expanded by remember {
         mutableStateOf(false)
     }
-    val expandedIcon = if (!expanded) Icons.Filled.ArrowDownward else Icons.Filled.ArrowUpward
+    val expandedIcon = if (!expanded) Icons.Filled.ArrowDropDown else Icons.Filled.ArrowDropUp
 
-    Card(
-        modifier = modifier.padding(16.dp),
-//        backgroundColor =,
-        shape = MaterialTheme.shapes.large
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .background(Color.Transparent),
     ) {
         Row(
             modifier = Modifier
@@ -73,28 +80,36 @@ fun PostItem(
         ) {
             //publisherProfile
             CoilImage(
-                imageUrl = userProfile!!,
+                imageUrl = if (userProfile != null) userProfile!! else "",
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = userName!!)
+            Text(
+                text = if (userName != null) userName!! else "",
+                fontSize = 15.sp
+            )
         }
         Spacer(modifier = Modifier.height(2.dp))
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = post.postImage
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.large)
-                .fillMaxWidth()
-                .aspectRatio(3f / 2f)
-                .clickable {
-                    //go to tabRow Section to see location and photos like ths
-                    onImageClick(post.postId)
-                }
-        )
-        Spacer(modifier = Modifier.height(2.dp))
+        Card(
+            shape = MaterialTheme.shapes.large
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = post.postImage
+                ),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp)
+//                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        //go to tabRow Section to see location and photos like ths
+                        onImageClick(post.postId)
+                    },
+            )
+        }
+//        Spacer(modifier = Modifier.height(2.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -121,7 +136,10 @@ fun PostItem(
                 )
                 if (post.score != "") {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Score: ${post.score}/10")
+                    Text(
+                        text = "Score: ${post.score}/10",
+                        fontSize = 10.sp
+                    )
                     //A row to show score length
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
@@ -131,9 +149,7 @@ fun PostItem(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-                //
-                /// convert post date to show
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = SimpleConvert.convertLongToDate(post.dateTime!!),
                     fontSize = 10.sp
@@ -148,6 +164,7 @@ fun PostItem(
             modifier = Modifier
                 .clickable {
                     //go to comment section
+                    onCommentClick(post.postId)
                 }
         )
     }

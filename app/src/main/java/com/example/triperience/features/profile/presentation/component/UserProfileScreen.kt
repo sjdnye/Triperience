@@ -77,7 +77,7 @@ fun UserProfileScreen(
                     }
                 },
                 backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onBackground,
                 elevation = 0.dp
             )
         },

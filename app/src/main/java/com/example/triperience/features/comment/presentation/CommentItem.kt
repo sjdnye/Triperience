@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.comment.domain.model.Comment
+import com.example.triperience.features.profile.presentation.component.CoilImage
+import com.example.triperience.utils.common.SimpleConvert
 
 @Composable
 fun CommentItem(
@@ -42,22 +44,22 @@ fun CommentItem(
         userUserName = user?.username
     }
 
-
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.padding(4.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = modifier
                 .fillMaxWidth()
                 .clickable {
                     onClick(comment.publisher)
                 }
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(model = userProfileImage!!),
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(32.dp),
-                contentScale = ContentScale.Crop,
+            CoilImage(
+                imageUrl = if (userProfileImage != null) userProfileImage!! else "",
+                modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(5.dp))
             Box(
@@ -66,11 +68,25 @@ fun CommentItem(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.BottomStart
             ) {
-                Text(text = userUserName!!, textAlign = TextAlign.Justify)
+                Text(
+                    text = if (userUserName != null) userUserName!! else "",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
-        Spacer(modifier = Modifier.height(5.dp))
-        Text(text = comment.description, fontSize = 15.sp)
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = comment.description,
+            modifier = Modifier.padding(start = 4.dp),
+            fontSize = 15.sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = SimpleConvert.convertLongToDate(comment.dateTime!!),
+            modifier = Modifier.padding(start = 4.dp),
+            fontSize = 10.sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }

@@ -12,20 +12,22 @@ import com.example.triperience.features.comment.domain.repository.CommentReposit
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
+import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CommentViewModel @Inject constructor(
     private val commentRepository: CommentRepository,
+    sharedPrefUtil: SharedPrefUtil,
     savedStateHandle: SavedStateHandle
-) : ViewModel(){
+) : ViewModel() {
+    var meUser by mutableStateOf<User?>(null)
+    private var postId: String? = null
+
     private val _comments = MutableStateFlow<List<Comment>?>(emptyList())
     val comments = _comments.asStateFlow()
 
@@ -35,24 +37,29 @@ class CommentViewModel @Inject constructor(
     val commentEventFlow = _commentEventFlow.asSharedFlow()
 
     init {
+        meUser = sharedPrefUtil.getCurrentUser()
         savedStateHandle.get<String>(Constants.POST_ID)?.let {
+            postId = it
             getAllComments(it)
         }
     }
 
 
-    private fun getAllComments(postId : String) {
+    private fun getAllComments(postId: String) {
         viewModelScope.launch {
-            commentRepository.getAllComments(postId = postId).collect{result ->
-                when(result){
+            commentRepository.getAllComments(postId = postId).collect { result ->
+                when (result) {
                     is Resource.Success -> {
                         isLoading = false
-                        _comments.value = result.data?.reversed()
+                        _comments.value = result.data!!.reversed()
                     }
                     is Resource.Error -> {
                         isLoading = false
                         sendCommentScreenUiEvent(
-                            ScreenUiEvent.ShowMessage(message = result.message.toString())
+                            ScreenUiEvent.ShowMessage(
+                                message = result.message.toString(),
+                                isToast = true
+                            )
                         )
                     }
                     is Resource.Loading -> {
@@ -63,14 +70,64 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    suspend fun getCommentPublisherInfo(publisherId: String) : User?{
+    suspend fun getCommentPublisherInfo(publisherId: String): User? {
         val job = viewModelScope.async {
             return@async commentRepository.getCommentPublisherInfo(publisherId = publisherId)
         }
         return job.await()
     }
 
-    private fun sendCommentScreenUiEvent(commentEvent: ScreenUiEvent){
+    fun sendComment(myComment: String) {
+        if(myComment == ""){
+            sendCommentScreenUiEvent(
+                ScreenUiEvent.ShowMessage(
+                    message = "Your comment can not be empty!",
+                    isToast = true
+                )
+            )
+        }else{
+            viewModelScope.launch {
+                commentRepository.sendComment(
+                    Comment(
+                        postId = postId!!,
+                        publisher = meUser?.userid!!,
+                        description = myComment,
+                        dateTime = System.currentTimeMillis()
+                    )
+                ).collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            sendCommentScreenUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = "Comment sent successfully",
+                                    isToast = true
+                                )
+                            )
+                        }
+                        is Resource.Error -> {
+                            sendCommentScreenUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = result.message.toString(),
+                                    isToast = true
+                                )
+                            )
+                        }
+                        is Resource.Loading -> {
+                            sendCommentScreenUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = "Please wait..",
+                                    isToast = true
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    private fun sendCommentScreenUiEvent(commentEvent: ScreenUiEvent) {
         viewModelScope.launch {
             _commentEventFlow.emit(commentEvent)
         }

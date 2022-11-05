@@ -22,6 +22,8 @@ fun SearchedUserItem(
     onClick: (userid:String) -> Unit
 ) {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
             .clickable {

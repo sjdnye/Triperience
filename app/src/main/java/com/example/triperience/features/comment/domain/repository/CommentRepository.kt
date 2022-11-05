@@ -10,4 +10,6 @@ interface CommentRepository {
      fun getAllComments(postId: String) : Flow<Resource<List<Comment>?>>
 
      suspend fun getCommentPublisherInfo(publisherId : String) : User?
+
+     suspend fun sendComment(comment: Comment) : Flow<Resource<Boolean>>
 }

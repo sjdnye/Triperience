@@ -5,15 +5,18 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.features.destinations.CommentScreenDestination
+import com.example.triperience.features.destinations.PostDetailScreenDestination
 import com.example.triperience.features.destinations.SearchScreenDestination
+import com.example.triperience.features.destinations.UserProfileScreenDestination
 import com.example.triperience.features.home.presentation.HomeViewModel
 import com.example.triperience.ui.theme.customFont
 import com.example.triperience.utils.common.PostItem
@@ -49,7 +52,16 @@ fun HomeScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text(text = "Triperience", fontFamily = customFont) }
+                title = {
+                    Text(
+                        text = "Triperience",
+                        fontFamily = customFont,
+                        fontSize = 25.sp,
+                        color = MaterialTheme.colors.onBackground
+                    )
+                },
+                backgroundColor = MaterialTheme.colors.background,
+                elevation = 0.dp
             )
         }
     ) {
@@ -57,25 +69,29 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 50.dp)
+            ) {
                 items(postsState!!) { post ->
                     PostItem(
                         onProfileClick = {
-
+                            navigator.navigate(UserProfileScreenDestination(userId = it))
                         },
                         onImageClick = {
-
                         },
-                        getPublisherDetail = {
-                            null
+                        onCommentClick = {
+                            navigator.navigate(CommentScreenDestination(postId = it.toString()))
                         },
                         homeViewModel = homeViewModel,
                         post = post
                     )
                 }
             }
-
+            if (homeViewModel.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         }
     }
-
 }

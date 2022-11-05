@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -96,18 +97,19 @@ fun EditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                   Row(
-                       modifier = Modifier.fillMaxWidth(),
-                       horizontalArrangement = Arrangement.Center
-                   ) {
-                       Text(
-                           text = "Edit Profile",
-                           textAlign = TextAlign.Center,
-                       )
-                   }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Edit Profile",
+                            textAlign = TextAlign.Start,
+                        )
+                    }
                 },
                 backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onBackground,
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -119,7 +121,7 @@ fun EditScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.cross_icon_18),
                             contentDescription = "Cancel",
-                            tint = MaterialTheme.colors.primary,
+                            modifier = Modifier.size(10.dp)
                         )
                     }
                 },
@@ -134,8 +136,8 @@ fun EditScreen(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.check_icon_18),
+                            modifier = Modifier.size(10.dp),
                             contentDescription = "Accept changes",
-                            tint = MaterialTheme.colors.primary
                         )
                     }
                 },
@@ -165,8 +167,6 @@ fun EditScreen(
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-
-
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

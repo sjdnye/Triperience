@@ -22,6 +22,8 @@ class CommentRepositoryImpl @Inject constructor(
         trySend(Resource.Loading())
         val snapShotListener = firestore
             .collection(Constants.COLLECTION_COMMENTS)
+            .document(postId)
+            .collection(Constants.COLLECTION_COMMENTS)
             .addSnapshotListener { snapshot, error ->
                 val response = if (snapshot != null) {
                     val comments = snapshot.toObjects(Comment::class.java)
@@ -42,6 +44,26 @@ class CommentRepositoryImpl @Inject constructor(
             .get()
             .await()
         return query.toObject(User::class.java)
+    }
+
+    override suspend fun sendComment(comment: Comment): Flow<Resource<Boolean>> = flow{
+        emit(Resource.Loading())
+        try {
+            firestore
+                .collection(Constants.COLLECTION_COMMENTS)
+                .document(comment.postId)
+                .collection(Constants.COLLECTION_COMMENTS)
+                .add(comment)
+                .await()
+            emit(Resource.Success(true))
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+
     }
 
 }
