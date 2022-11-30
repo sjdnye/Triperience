@@ -99,4 +99,5 @@ object FirebaseModule {
     fun provideCommentRepository(firestore: FirebaseFirestore) : CommentRepository{
         return CommentRepositoryImpl(firestore = firestore)
     }
+
 }

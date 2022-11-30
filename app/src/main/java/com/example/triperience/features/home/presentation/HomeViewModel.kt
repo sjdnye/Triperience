@@ -37,12 +37,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         meUser = sharedPrefUtil.getCurrentUser()
-        getPosts(meUser?.following!!)
+        getPosts()
     }
 
-   private fun getPosts(followingList: List<String>) {
+    fun getPosts() {
        viewModelScope.launch {
-           homeRepository.getRelevantPost(followingList = followingList).collect{result ->
+           homeRepository.getRelevantPost(followingList = meUser?.following!!).collect{result ->
                when(result){
                    is Resource.Success -> {
                        isLoading = false

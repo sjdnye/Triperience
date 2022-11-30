@@ -39,7 +39,7 @@ import kotlin.random.Random
 fun PostItem(
     modifier: Modifier = Modifier,
     onProfileClick: (userId: String) -> Unit,
-    onImageClick: (postId: String) -> Unit,
+    onImageClick: (latitude: Double, longitude: Double) -> Unit,
     onCommentClick: (postId: String) -> Unit,
     homeViewModel: HomeViewModel,
     post: Post
@@ -105,7 +105,7 @@ fun PostItem(
 //                    .clip(RoundedCornerShape(10.dp))
                     .clickable {
                         //go to tabRow Section to see location and photos like ths
-                        onImageClick(post.postId)
+                        onImageClick(post.latitude!!, post.longitude!!)
                     },
             )
         }

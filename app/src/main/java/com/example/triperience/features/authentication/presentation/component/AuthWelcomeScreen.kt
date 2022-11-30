@@ -40,7 +40,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun AuthWelcomeScreen(
     navigator: DestinationsNavigator,
-    viewModel: AuthViewModel = hiltViewModel()
 ) {
     Box(
         modifier = Modifier

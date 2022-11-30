@@ -107,15 +107,7 @@ fun SearchScreen(
                         }
                     }
                 } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(
-                                rememberScrollState()
-                            )
-                    ) {
                         CardSection()
-                    }
                 }
             }
             if (searchScreenViewModel.isLoading) {
@@ -168,12 +160,19 @@ fun CategoryCardItem(
 }
 
 @Composable
-fun CardSection() {
+fun CardSection(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(20.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(bottom = 20.dp)
+            .verticalScroll(
+                rememberScrollState()
+            ),
+//            .clip(RoundedCornerShape(20.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround
     ) {
         CategoryCardItem(
             modifier = Modifier
@@ -190,7 +189,6 @@ fun CardSection() {
             ),
             title = "Sea"
         )
-        Spacer(modifier = Modifier.height(5.dp))
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
@@ -206,7 +204,6 @@ fun CardSection() {
             ),
             title = "Jungle"
         )
-        Spacer(modifier = Modifier.height(5.dp))
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
@@ -222,7 +219,6 @@ fun CardSection() {
             ),
             title = "Mountain"
         )
-        Spacer(modifier = Modifier.height(5.dp))
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
@@ -238,7 +234,6 @@ fun CardSection() {
             ),
             title = "Desert"
         )
-        Spacer(modifier = Modifier.height(5.dp))
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()

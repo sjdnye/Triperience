@@ -79,6 +79,7 @@ fun CommentItem(
         Text(
             text = comment.description,
             modifier = Modifier.padding(start = 4.dp),
+            maxLines = 15,
             fontSize = 15.sp
         )
         Spacer(modifier = Modifier.height(4.dp))

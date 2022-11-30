@@ -78,7 +78,7 @@ class CommentViewModel @Inject constructor(
     }
 
     fun sendComment(myComment: String) {
-        if(myComment == ""){
+        if(myComment.trim().isEmpty()){
             sendCommentScreenUiEvent(
                 ScreenUiEvent.ShowMessage(
                     message = "Your comment can not be empty!",

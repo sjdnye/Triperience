@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +22,8 @@ import com.example.triperience.features.home.presentation.HomeViewModel
 import com.example.triperience.ui.theme.customFont
 import com.example.triperience.utils.common.PostItem
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.async
@@ -36,7 +39,10 @@ fun HomeScreen(
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val state = rememberLazyListState()
     val postsState by homeViewModel.posts.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = homeViewModel.isLoading)
+
 
     LaunchedEffect(key1 = true) {
         homeViewModel.homeEventFLow.collect { result ->
@@ -69,29 +75,39 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 50.dp)
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = homeViewModel::getPosts
             ) {
-                items(postsState!!) { post ->
-                    PostItem(
-                        onProfileClick = {
-                            navigator.navigate(UserProfileScreenDestination(userId = it))
-                        },
-                        onImageClick = {
-                        },
-                        onCommentClick = {
-                            navigator.navigate(CommentScreenDestination(postId = it.toString()))
-                        },
-                        homeViewModel = homeViewModel,
-                        post = post
-                    )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 50.dp),
+                    state = state
+                ) {
+                    items(postsState!!) { post ->
+                        PostItem(
+                            onProfileClick = {
+                                navigator.navigate(UserProfileScreenDestination(userId = it))
+                            },
+                            onImageClick = { latitude, longitude ->
+                                navigator.navigate(PostDetailScreenDestination(latitude, longitude))
+                            },
+                            onCommentClick = {
+                                navigator.navigate(CommentScreenDestination(postId = it.toString()))
+                            },
+                            homeViewModel = homeViewModel,
+                            post = post
+                        )
+                    }
                 }
+//                if (homeViewModel.isLoading) {
+//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//                }
+
             }
-            if (homeViewModel.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
+
         }
     }
 }
