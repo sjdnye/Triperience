@@ -113,6 +113,7 @@ fun CommentScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
+                    reverseLayout = true,
                     state = state
                 ) {
                     items(comments!!) { comment ->
@@ -193,47 +194,6 @@ fun CommentScreen(
                         }
                     }
                 }
-//                    CustomTextField2(
-//                        modifier = Modifier
-//                            .align(Alignment.BottomStart)
-//                            .fillMaxWidth()
-//                            .padding(start = 12.dp, end = 12.dp)
-//                            .onFocusEvent { event ->
-//                                if (event.isFocused) {
-//                                    coroutineScope.launch {
-//                                        bringIntoViewRequester.bringIntoView()
-//                                    }
-//                                }
-//                            },
-//                        value = myComment,
-//                        onValueChange = {
-//                            myComment = it
-//                        },
-//                        label = "Comment",
-//                        placeholder = "Type your opinion...",
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Text,
-//                        ),
-//                        keyboardActions = KeyboardActions(),
-//                        maxLine = 15
-//                    )
-//                    if (myComment.isNotBlank()) {
-//                        IconButton(
-//                            modifier = Modifier
-//                                .align(Alignment.BottomEnd)
-//                                .size(30.dp),
-//                            onClick = {
-//                                commentViewModel.sendComment(myComment = myComment)
-//                                myComment = ""
-//                            }
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Default.Send,
-//                                contentDescription = "sendMessage",
-//                                tint = MaterialTheme.colors.primary,
-//                            )
-//                        }
-//                    }
             }
             if (commentViewModel.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

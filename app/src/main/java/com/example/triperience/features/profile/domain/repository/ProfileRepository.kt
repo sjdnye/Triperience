@@ -2,12 +2,15 @@ package com.example.triperience.features.profile.domain.repository
 
 import android.net.Uri
 import com.example.triperience.features.authentication.domain.model.User
+import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
     fun getUserInformation(userid: String): Flow<Resource<User>>
+
+    suspend fun getUserPosts(userId : String) : Flow<Resource<List<Post>?>>
 
     suspend fun setUserInformation(
         userid: String,
@@ -26,6 +29,8 @@ interface ProfileRepository {
         myId: String,
         userid: String
     ): Flow<Resource<Boolean>>
+
+    suspend fun deletePost(postId : String, userId: String) : Flow<Resource<Boolean>>
 
 
 }

@@ -30,7 +30,7 @@ class HomeRepositoryImpl @Inject constructor(
                 .get()
                 .await()
             val posts = query.toObjects(Post::class.java)
-            emit(Resource.Success(data = posts))
+            emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
 
         }catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))

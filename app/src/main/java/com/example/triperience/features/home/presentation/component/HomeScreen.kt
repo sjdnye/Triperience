@@ -2,6 +2,7 @@ package com.example.triperience.features.home.presentation.component
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.R
 import com.example.triperience.features.destinations.CommentScreenDestination
 import com.example.triperience.features.destinations.PostDetailScreenDestination
 import com.example.triperience.features.destinations.SearchScreenDestination
@@ -59,11 +62,11 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Triperience",
-                        fontFamily = customFont,
-                        fontSize = 25.sp,
-                        color = MaterialTheme.colors.onBackground
+                    Image(
+                        painter = painterResource(id = R.drawable.main_logo),
+                        contentDescription = "Home screen Logo",
+                        modifier = Modifier
+                            .fillMaxHeight()
                     )
                 },
                 backgroundColor = MaterialTheme.colors.background,
@@ -102,12 +105,7 @@ fun HomeScreen(
                         )
                     }
                 }
-//                if (homeViewModel.isLoading) {
-//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                }
-
             }
-
         }
     }
 }

@@ -29,7 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.draw.scale
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.destinations.LoginScreenDestination
 import com.example.triperience.features.destinations.RegisterScreenDestination
@@ -51,17 +53,23 @@ fun AuthWelcomeScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = CenterHorizontally
         ) {
-            Text(
-                text = "Triperience",
-                modifier = Modifier.align(CenterHorizontally),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onBackground,
-                style = TextStyle(
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Image(
+                painter = painterResource(id = R.drawable.main_logo),
+                contentDescription = "Splash Screen Logo",
+                modifier = Modifier
+                    .align(CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(20.dp))
+//            Text(
+//                text = "Triperience",
+//                modifier = Modifier.align(CenterHorizontally),
+//                textAlign = TextAlign.Center,
+//                color = MaterialTheme.colors.onBackground,
+//                style = TextStyle(
+//                    fontSize = 40.sp,
+//                    fontWeight = FontWeight.Bold,
+//                )
+//            )
+//            Spacer(modifier = Modifier.height(20.dp))
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center

@@ -81,7 +81,7 @@ fun LoginScreen(
                 }
                 is AuthenticationUiEvent.ShowMessage -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = it.message
+                        message = it.message,
                     )
                 }
             }
@@ -93,8 +93,8 @@ fun LoginScreen(
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
                 Snackbar(
-                    backgroundColor = MaterialTheme.colors.onBackground,
-                    snackbarData = data
+                    snackbarData = data,
+                    backgroundColor = MaterialTheme.colors.primary
                 )
             }
         },

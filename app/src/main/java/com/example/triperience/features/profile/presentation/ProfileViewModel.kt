@@ -17,8 +17,10 @@ import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,6 +39,9 @@ class ProfileViewModel @Inject constructor(
 
     var meUser by mutableStateOf<User?>(null)
     var showDialog by mutableStateOf(false)
+
+    var showDeletePostDialog by mutableStateOf(false)
+    var deletedPost by mutableStateOf<String?>(null)
 
     var isShowFollowButton by mutableStateOf(false)
 
@@ -57,7 +62,6 @@ class ProfileViewModel @Inject constructor(
             mainButtonText =
                 if (meUser?.following!!.contains(it)) "following" else "follow"
         } ?: meUser?.userid?.let { getUserInformation(it) }
-
     }
 
 
@@ -71,6 +75,9 @@ class ProfileViewModel @Inject constructor(
                             sharedPrefUtil.saveCurrentUser(result.data)
                             meUser = result.data
                         }
+                         async {
+                             getUserPosts(userId = userId)
+                         }
                     }
                     is Resource.Error -> {
                         state = state.copy(isLoading = false, error = result.message.toString())
@@ -82,6 +89,24 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun getUserPosts(userId: String){
+
+            profileRepository.getUserPosts(userId = userId).collect{result ->
+                when(result){
+                    is Resource.Success -> {
+                        state = state.copy(posts = result.data, postsIsLoading = false, error = "")
+                    }
+                    is Resource.Error -> {
+                        state = state.copy(postsIsLoading = false, error = result.message.toString())
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
+                    }
+                    is Resource.Loading -> {
+                        state = state.copy(postsIsLoading = true)
+                    }
+                }
+            }
     }
 
     fun setUserInformation(username: String, bio: String) {
@@ -172,6 +197,36 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun deletePost() {
+        viewModelScope.launch {
+            profileRepository.deletePost(postId = deletedPost!!, meUser!!.userid).collect{result ->
+                when (result) {
+                    is Resource.Success -> {
+                        state = state.copy(isLoading = false)
+                        sendProfileUiEvent(
+                            ScreenUiEvent.ShowMessage(
+                                message = "Selected post has been deleted successfully!",
+                                isToast = true
+                            )
+                        )
+                    }
+                    is Resource.Error -> {
+                        state = state.copy(isLoading = false)
+                        sendProfileUiEvent(
+                            ScreenUiEvent.ShowMessage(
+                                message = result.message.toString(),
+                            )
+                        )
+                    }
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
+                }
+                deletedPost = null
+            }
+        }
+    }
+
     fun followUser(userid: String) {
         val myFollowing: MutableList<String> = meUser!!.following as MutableList<String>
         viewModelScope.launch {
@@ -225,7 +280,6 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun sendProfileUiEvent(profileScreenUiEvent: ScreenUiEvent) {
         viewModelScope.launch {

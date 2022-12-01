@@ -2,15 +2,18 @@ package com.example.triperience.features.profile.presentation.component
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.Center
@@ -27,14 +30,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.authentication.presentation.AuthViewModel
-import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
-import com.example.triperience.features.destinations.EditScreenDestination
-import com.example.triperience.features.destinations.UploadPostScreenDestination
+import com.example.triperience.features.destinations.*
 import com.example.triperience.features.profile.presentation.ProfileViewModel
+import com.example.triperience.utils.common.MyPostItem
+import com.example.triperience.utils.common.PostItem
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -55,6 +63,23 @@ fun ProfileScreen(
         bottomSheetState = sheetState
     )
     val scope = rememberCoroutineScope()
+    val swipeRefreshState =
+        rememberSwipeRefreshState(isRefreshing = profileViewModel.state.postsIsLoading)
+
+    val lazyListState = rememberLazyListState()
+    var mainTitle by remember {
+        mutableStateOf<String>("")
+    }
+
+    val profileHeaderWeightAnimated by animateFloatAsState(
+        targetValue = if (lazyListState.isScrolled) 1f else 2f,
+        animationSpec = tween(durationMillis = 300)
+    )
+    val postSectionWeightAnimated by animateFloatAsState(
+        targetValue = if (lazyListState.isScrolled) 9f else 8f,
+        animationSpec = tween(durationMillis = 300)
+    )
+
 
     LaunchedEffect(key1 = true) {
         profileViewModel.profileEventFlow.collect {
@@ -110,7 +135,16 @@ fun ProfileScreen(
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    Text(
+                        text = mainTitle,
+                        style = TextStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+
+                },
                 actions = {
                     IconButton(
                         onClick = {
@@ -137,6 +171,12 @@ fun ProfileScreen(
         ) {
         Box(modifier = Modifier.fillMaxSize()) {
             profileViewModel.state.user?.let { user ->
+                mainTitle = if (lazyListState.isScrolled) {
+                    "${user.posts.size} post(s)"
+                } else {
+                    ""
+
+                }
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -144,25 +184,21 @@ fun ProfileScreen(
                     ProfileHeader(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(2f),
+                            .weight(profileHeaderWeightAnimated),
                         user = user
                     )
-                    Spacer(modifier = Modifier.height(5.dp))
-//                    Text(
-//                        text = "Posts: ${user.posts.size.toString()}",
-//                        style = TextStyle(
-//                            color = MaterialTheme.colors.primary,
-//                            fontFamily = FontFamily.Default,
-//                            fontSize = 30.sp,
-//                        )
-//                    )
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(8f)
-                    ) {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    }
+                    PostSection(
+                        modifier = Modifier.weight(postSectionWeightAnimated),
+                        swipeRefreshState = swipeRefreshState,
+                        scope = scope,
+                        profileViewModel = profileViewModel,
+                        user = user,
+                        navigator = navigator,
+                        lazyListState = lazyListState
+                    )
+
                 }
                 if (user.posts.isEmpty()) {
                     Text(
@@ -174,6 +210,8 @@ fun ProfileScreen(
             if (profileViewModel.showDialog) {
                 SimpleAlertDialog(
                     modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                    title = "Log out",
+                    description = "Are you sure?",
                     onDismissRequest = {
                         profileViewModel.showDialog = false
                     },
@@ -182,17 +220,33 @@ fun ProfileScreen(
                         FirebaseAuth.getInstance().signOut()
                         navigator.popBackStack()
                         navigator.navigate(AuthWelcomeScreenDestination)
-
                     },
                     dismissButton = {
                         profileViewModel.showDialog = false
                     }
                 )
             }
-
-            if (profileViewModel.state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            if (profileViewModel.showDeletePostDialog) {
+                SimpleAlertDialog(
+                    modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                    title = "Delete Post",
+                    description = "This post will be deleted forever. Do you want to continue?",
+                    onDismissRequest = {
+                        profileViewModel.showDeletePostDialog = false
+                    },
+                    confirmButton = {
+                        profileViewModel.showDeletePostDialog = false
+                        profileViewModel.deletePost()
+                    },
+                    dismissButton = {
+                        profileViewModel.showDeletePostDialog = false
+                    }
+                )
             }
+
+//            if (profileViewModel.state.isLoading) {
+//                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//            }
 
         }
     }
@@ -301,5 +355,65 @@ fun ProfileHeader(
     }
 }
 
+@Composable
+fun PostSection(
+    modifier: Modifier = Modifier,
+    swipeRefreshState: SwipeRefreshState,
+    scope: CoroutineScope,
+    profileViewModel: ProfileViewModel,
+    user: User,
+    navigator: DestinationsNavigator,
+    lazyListState: LazyListState
+) {
+    SwipeRefresh(
+        modifier = modifier
+            .fillMaxSize(),
+        state = swipeRefreshState,
+        onRefresh = {
+            scope.launch {
+                profileViewModel.getUserPosts(userId = user.userid)
+            }
+        }
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 50.dp),
+            state = lazyListState
+
+        ) {
+
+            profileViewModel.state.posts?.let { posts ->
+                items(posts) { post ->
+                    MyPostItem(
+                        onImageClick = { latitude, longitude ->
+                            navigator.navigate(
+                                PostDetailScreenDestination(
+                                    latitude,
+                                    longitude
+                                )
+                            )
+                        },
+                        onCommentClick = {
+                            navigator.navigate(CommentScreenDestination(postId = it.toString()))
+                        },
+                        onDeleteButton = {
+                            profileViewModel.deletedPost = it
+                            profileViewModel.showDeletePostDialog = true
+                        },
+                        post = post,
+                        userProfileImage = user.profileImage,
+                        userName = user.username,
+                        showDeleteButton = user.userid == profileViewModel.meUser!!.userid
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+val LazyListState.isScrolled: Boolean
+    get() = firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
 
 

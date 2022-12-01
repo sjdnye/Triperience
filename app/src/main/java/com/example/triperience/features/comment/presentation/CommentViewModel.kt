@@ -51,7 +51,7 @@ class CommentViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         isLoading = false
-                        _comments.value = result.data!!.reversed()
+                        _comments.value = result.data!!.sortedByDescending { it.dateTime }
                     }
                     is Resource.Error -> {
                         isLoading = false

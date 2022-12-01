@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SimpleAlertDialog(
     modifier: Modifier,
+    title:String = "",
+    description:String = "",
     onDismissRequest: () -> Unit,
     confirmButton: () -> Unit,
     dismissButton: () -> Unit
@@ -32,7 +34,7 @@ fun SimpleAlertDialog(
                 }
             ) { Text(text = "No") }
         },
-        title = { Text(text = "Log Out") },
-        text = { Text(text = "Are you sure ?") }
+        title = { Text(text = title) },
+        text = { Text(text = description) }
     )
 }

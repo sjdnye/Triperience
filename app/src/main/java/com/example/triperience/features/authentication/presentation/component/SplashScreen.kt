@@ -38,15 +38,15 @@ fun SplashScreen(
 
         viewModel.getUser()
         scale.animateTo(
-            targetValue = 0.5f,
+            targetValue = 1.5f,
             animationSpec = tween(
-                durationMillis = 500,
+                durationMillis = 1000,
                 easing = {
                     OvershootInterpolator(2f).getInterpolation(it)
                 }
             )
         )
-        delay(1000)
+        delay(500)
 
         if (viewModel.isUserAuthenticated) {
             navigator.popBackStack()
@@ -56,9 +56,14 @@ fun SplashScreen(
             navigator.navigate(AuthWelcomeScreenDestination)
         }
     }
-//    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-//        Image(painter = painterResource(id = R.drawable.ic_instagram_logo),
-//            contentDescription = "Splash Screen Logo", modifier = Modifier.scale(scale.value))
-//    }
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
+        Image(
+            painter = painterResource(id = R.drawable.main_logo),
+            contentDescription = "Splash Screen Logo",
+            modifier = Modifier
+                .scale(scale.value)
+                .align(Alignment.Center)
+        )
+    }
 
 }

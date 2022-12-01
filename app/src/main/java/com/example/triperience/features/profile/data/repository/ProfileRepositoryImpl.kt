@@ -1,8 +1,10 @@
 package com.example.triperience.features.profile.data.repository
 
 import android.net.Uri
+import android.telephony.ims.ImsReasonInfo
 import android.util.Log
 import com.example.triperience.features.authentication.domain.model.User
+import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.features.profile.domain.repository.ProfileRepository
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
@@ -41,6 +43,24 @@ class ProfileRepositoryImpl @Inject constructor(
             }
         awaitClose {
             snapShotListener.remove()
+        }
+    }
+
+    override suspend fun getUserPosts(userId: String): Flow<Resource<List<Post>?>> = flow{
+        try {
+            emit(Resource.Loading())
+            val query = firestore.collection(Constants.COLLECTION_POST)
+                .whereEqualTo(Constants.PUBLISHER_ID, userId)
+                .get()
+                .await()
+            val posts = query.toObjects(Post::class.java)
+            emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         }
     }
 
@@ -143,5 +163,30 @@ class ProfileRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         }
+    }
+
+    override suspend fun deletePost(postId: String, userId: String): Flow<Resource<Boolean>> = flow{
+        try {
+            emit(Resource.Loading())
+            firestore.collection(Constants.COLLECTION_POST)
+                .document(postId)
+                .delete()
+                .await()
+
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(userId)
+                .update("posts", FieldValue.arrayRemove(postId))
+                .await()
+
+            emit(Resource.Success(data = true))
+
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+
     }
 }

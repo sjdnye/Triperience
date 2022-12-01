@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.home.presentation.HomeViewModel
 import com.example.triperience.features.profile.domain.model.Post
+import com.example.triperience.features.profile.presentation.ProfileViewModel
 import com.example.triperience.features.profile.presentation.component.CoilImage
 import com.example.triperience.ui.theme.LightBlue300
 import com.example.triperience.ui.theme.LightBlue500
@@ -36,27 +34,19 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 @Composable
-fun PostItem(
+fun MyPostItem(
     modifier: Modifier = Modifier,
-    onProfileClick: (userId: String) -> Unit,
     onImageClick: (latitude: Double, longitude: Double) -> Unit,
     onCommentClick: (postId: String) -> Unit,
-    homeViewModel: HomeViewModel,
-    post: Post
+    onDeleteButton: (postId:String) -> Unit,
+    post: Post,
+    userProfileImage: String?,
+    userName: String?,
+    showDeleteButton : Boolean = false
 ) {
-    var userProfile by remember {
-        mutableStateOf<String?>(null)
-    }
-    var userName by remember {
-        mutableStateOf<String?>(null)
-    }
+
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = true) {
-        val publisher = homeViewModel.getPostPublisherDetail(post.publisher)
-        userProfile = publisher?.profileImage
-        userName = publisher?.username
-    }
 
     var expanded by remember {
         mutableStateOf(false)
@@ -69,26 +59,35 @@ fun PostItem(
             .padding(4.dp)
             .background(Color.Transparent),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    //go to profile page of user
-                    onProfileClick(post.publisher)
+       Box(modifier = Modifier.fillMaxWidth()){
+           Row(
+               modifier = Modifier
+                   .fillMaxWidth()
+           ) {
+               //publisherProfile
+               CoilImage(
+                   imageUrl = if (userProfileImage != null) userProfileImage!! else "",
+                   modifier = Modifier
+                       .size(32.dp)
+               )
+               Spacer(modifier = Modifier.width(10.dp))
+               Text(
+                   text = if (userName != null) userName!! else "",
+                   fontSize = 15.sp
+               )
+           }
+           if(showDeleteButton){
+               IconButton(
+                   modifier = Modifier.align(Alignment.CenterEnd),
+                   onClick = {
+                       onDeleteButton(post.postId)
+                   }
+               ) {
+                   Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete post")
+               }
+           }
 
-                }
-        ) {
-            //publisherProfile
-            CoilImage(
-                imageUrl = if (userProfile != null) userProfile!! else "",
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-                text = if (userName != null) userName!! else "",
-                fontSize = 15.sp
-            )
-        }
+       }
         Spacer(modifier = Modifier.height(2.dp))
         Card(
             shape = MaterialTheme.shapes.large
@@ -163,10 +162,8 @@ fun PostItem(
             fontSize = 10.sp,
             modifier = Modifier
                 .clickable {
-                    //go to comment section
                     onCommentClick(post.postId)
                 }
-
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
