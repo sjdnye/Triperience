@@ -15,11 +15,18 @@ object Constants{
 
     const val CURRENT_USER: String = "currentUser"
     const val USER_USERNAME: String = "username"
-    const val USER_ID: String = "userId"
+    const val USER_ID: String = "userid"
     const val POST_ID : String = "postId"
     const val PUBLISHER_ID = "publisher"
     const val DATE_TIME = "dateTime"
 
     const val FOLLOW_USER_TEXT = "follow"
     const val FOLLOWING_USER_TEXT = "following"
+
+    const val POST_CATEGORY = "postCategory"
+    const val CATEGORY_SEA = "Sea"
+    const val CATEGORY_DESERT = "Desert"
+    const val CATEGORY_JUNGLE = "Jungle"
+    const val CATEGORY_MOUNTAIN= "Mountain"
+    const val CATEGORY_CITY = "City"
 }

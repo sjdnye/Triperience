@@ -1,6 +1,7 @@
 package com.example.triperience.features.search.data.repository
 
 import com.example.triperience.features.authentication.domain.model.User
+import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.features.search.domain.repository.SearchRepository
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
@@ -27,6 +28,25 @@ class SearchRepositoryImpl @Inject constructor(
 
             val result : List<User> = query.toObjects(User::class.java)
             emit(Resource.Success(data = result))
+
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+    }
+
+    override suspend fun searchPostsByCategory(category: String): Flow<Resource<List<Post>?>> = flow{
+        try {
+            emit(Resource.Loading())
+            val query = firestore.collection(Constants.COLLECTION_POST)
+                .whereEqualTo(Constants.POST_CATEGORY, category.trim())
+                .get()
+                .await()
+            val posts = query.toObjects(Post::class.java)
+            emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
 
         }catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))

@@ -37,6 +37,10 @@ class ProfileViewModel @Inject constructor(
     var state by mutableStateOf<ProfileState>(ProfileState())
         private set
 
+    var followListUser by mutableStateOf<List<User>?>(emptyList())
+        private set
+    var followListIsLoading by mutableStateOf(false)
+
     var meUser by mutableStateOf<User?>(null)
     var showDialog by mutableStateOf(false)
 
@@ -55,7 +59,7 @@ class ProfileViewModel @Inject constructor(
     init {
         meUser = sharedPrefUtil.getCurrentUser()
         savedStateHandle.get<String>(Constants.USER_ID)?.let {
-            if (meUser?.userid!! != it){
+            if (meUser?.userid!! != it) {
                 isShowFollowButton = true
             }
             getUserInformation(it)
@@ -75,9 +79,9 @@ class ProfileViewModel @Inject constructor(
                             sharedPrefUtil.saveCurrentUser(result.data)
                             meUser = result.data
                         }
-                         async {
-                             getUserPosts(userId = userId)
-                         }
+                        async {
+                            getUserPosts(userId = userId)
+                        }
                     }
                     is Resource.Error -> {
                         state = state.copy(isLoading = false, error = result.message.toString())
@@ -91,22 +95,22 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserPosts(userId: String){
+    suspend fun getUserPosts(userId: String) {
 
-            profileRepository.getUserPosts(userId = userId).collect{result ->
-                when(result){
-                    is Resource.Success -> {
-                        state = state.copy(posts = result.data, postsIsLoading = false, error = "")
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(postsIsLoading = false, error = result.message.toString())
-                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
-                    }
-                    is Resource.Loading -> {
-                        state = state.copy(postsIsLoading = true)
-                    }
+        profileRepository.getUserPosts(userId = userId).collect { result ->
+            when (result) {
+                is Resource.Success -> {
+                    state = state.copy(posts = result.data, postsIsLoading = false, error = "")
+                }
+                is Resource.Error -> {
+                    state = state.copy(postsIsLoading = false, error = result.message.toString())
+                    sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
+                }
+                is Resource.Loading -> {
+                    state = state.copy(postsIsLoading = true)
                 }
             }
+        }
     }
 
     fun setUserInformation(username: String, bio: String) {
@@ -199,31 +203,32 @@ class ProfileViewModel @Inject constructor(
 
     fun deletePost() {
         viewModelScope.launch {
-            profileRepository.deletePost(postId = deletedPost!!, meUser!!.userid).collect{result ->
-                when (result) {
-                    is Resource.Success -> {
-                        state = state.copy(isLoading = false)
-                        sendProfileUiEvent(
-                            ScreenUiEvent.ShowMessage(
-                                message = "Selected post has been deleted successfully!",
-                                isToast = true
+            profileRepository.deletePost(postId = deletedPost!!, meUser!!.userid)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            state = state.copy(isLoading = false)
+                            sendProfileUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = "Selected post has been deleted successfully!",
+                                    isToast = true
+                                )
                             )
-                        )
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(isLoading = false)
-                        sendProfileUiEvent(
-                            ScreenUiEvent.ShowMessage(
-                                message = result.message.toString(),
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(isLoading = false)
+                            sendProfileUiEvent(
+                                ScreenUiEvent.ShowMessage(
+                                    message = result.message.toString(),
+                                )
                             )
-                        )
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(isLoading = true)
+                        }
                     }
-                    is Resource.Loading -> {
-                        state = state.copy(isLoading = true)
-                    }
+                    deletedPost = null
                 }
-                deletedPost = null
-            }
         }
     }
 
@@ -275,6 +280,26 @@ class ProfileViewModel @Inject constructor(
                     }
                     is Resource.Loading -> {
                         mainButtonIsLoading = true
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun getFollowListUsers(followList: List<String>){
+        viewModelScope.launch {
+            profileRepository.getFollowListUsers(followList = followList).collect{result ->
+                when(result){
+                    is Resource.Success -> {
+                        followListIsLoading = false
+                        followListUser = result.data
+                    }
+                    is Resource.Error -> {
+                        followListIsLoading = false
+                        sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message.toString()))
+                    }
+                    is Resource.Loading -> {
+                        followListIsLoading = true
                     }
                 }
             }

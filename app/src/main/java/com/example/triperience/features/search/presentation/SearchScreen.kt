@@ -34,12 +34,16 @@ import com.example.triperience.R
 import com.example.triperience.features.authentication.presentation.component.AuthWelcomeScreen
 import com.example.triperience.features.authentication.presentation.component.CustomTextField
 import com.example.triperience.features.destinations.AuthWelcomeScreenDestination
+import com.example.triperience.features.destinations.SearchedPostsCategoryScreenDestination
 import com.example.triperience.features.destinations.UserProfileScreenDestination
 import com.example.triperience.ui.theme.*
+import com.example.triperience.utils.Constants
 import com.example.triperience.utils.common.SearchedUserItem
+import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -55,13 +59,31 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
 
 
-
     var searchQuery by remember {
         mutableStateOf("")
     }
+    LaunchedEffect(key1 = true) {
+        searchScreenViewModel.searchEventFlow.collect { result ->
+            when (result) {
+                is ScreenUiEvent.ShowMessage -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = result.message
+                    )
+                }
+            }
+        }
+    }
 
     Scaffold(
-        scaffoldState = scaffoldState
+        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = it) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            }
+        }
     ) {
         Box(
             modifier = Modifier
@@ -100,14 +122,14 @@ fun SearchScreen(
                             SearchedUserItem(
                                 user = user,
                                 onClick = {
-                                    navigator.navigate(UserProfileScreenDestination(userId = user.userid))
+                                    navigator.navigate(UserProfileScreenDestination(userid = user.userid))
                                 }
                             )
                             Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
                 } else {
-                        CardSection()
+                    CardSection(navigator = navigator)
                 }
             }
             if (searchScreenViewModel.isLoading) {
@@ -122,7 +144,7 @@ fun CategoryCardItem(
     modifier: Modifier = Modifier,
     painter: Painter,
     gradiant: Brush,
-    title: String
+    title: String,
 ) {
     Card(
         modifier = modifier
@@ -161,6 +183,7 @@ fun CategoryCardItem(
 
 @Composable
 fun CardSection(
+    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -178,7 +201,7 @@ fun CardSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    navigator.navigate(SearchedPostsCategoryScreenDestination(category = Constants.CATEGORY_SEA))
                 },
             painter = painterResource(id = R.drawable.sea),
             gradiant = Brush.horizontalGradient(
@@ -187,13 +210,13 @@ fun CardSection(
                     LightBlue100
                 )
             ),
-            title = "Sea"
+            title = Constants.CATEGORY_SEA
         )
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    navigator.navigate(SearchedPostsCategoryScreenDestination(category = Constants.CATEGORY_JUNGLE))
                 },
             painter = painterResource(id = R.drawable.forest),
             gradiant = Brush.horizontalGradient(
@@ -202,13 +225,13 @@ fun CardSection(
                     LightGreen100
                 )
             ),
-            title = "Jungle"
+            title = Constants.CATEGORY_JUNGLE
         )
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    navigator.navigate(SearchedPostsCategoryScreenDestination(category = Constants.CATEGORY_MOUNTAIN))
                 },
             painter = painterResource(id = R.drawable.mountain),
             gradiant = Brush.horizontalGradient(
@@ -217,13 +240,13 @@ fun CardSection(
                     BlueGray100
                 )
             ),
-            title = "Mountain"
+            title = Constants.CATEGORY_MOUNTAIN
         )
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    navigator.navigate(SearchedPostsCategoryScreenDestination(category = Constants.CATEGORY_DESERT))
                 },
             painter = painterResource(id = R.drawable.desert),
             gradiant = Brush.horizontalGradient(
@@ -232,13 +255,13 @@ fun CardSection(
                     LightYellow100
                 )
             ),
-            title = "Desert"
+            title = Constants.CATEGORY_DESERT
         )
         CategoryCardItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    navigator.navigate(SearchedPostsCategoryScreenDestination(category = Constants.CATEGORY_CITY))
                 },
             painter = painterResource(id = R.drawable.city),
             gradiant = Brush.horizontalGradient(
@@ -247,7 +270,7 @@ fun CardSection(
                     LightPink100
                 )
             ),
-            title = "City"
+            title = Constants.CATEGORY_CITY
         )
     }
 }

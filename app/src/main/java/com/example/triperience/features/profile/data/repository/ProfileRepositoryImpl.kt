@@ -189,4 +189,24 @@ class ProfileRepositoryImpl @Inject constructor(
         }
 
     }
+
+    override suspend fun getFollowListUsers(followList: List<String>): Flow<Resource<List<User>?>>  = flow{
+        try {
+            emit(Resource.Loading())
+            val query = firestore.collection(Constants.COLLECTION_USERS)
+                .whereIn(Constants.USER_ID, followList)
+                .get()
+                .await()
+
+            val result = query.toObjects(User::class.java)
+            emit(Resource.Success(result.sortedBy { it.username }))
+
+        }catch (e: IOException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        } catch (e: Exception) {
+            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+        }
+    }
 }

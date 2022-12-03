@@ -10,6 +10,7 @@ import com.example.triperience.features.home.domain.repository.HomeRepository
 import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
+import com.example.triperience.utils.core.GetPostsPublisher
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
-    private val sharedPrefUtil: SharedPrefUtil
+    private val sharedPrefUtil: SharedPrefUtil,
+    val getPostsPublisher: GetPostsPublisher
 ) : ViewModel() {
 
 
@@ -64,13 +66,13 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    suspend fun getPostPublisherDetail(userId: String) : User? {
-      val job = viewModelScope.async {
-          return@async homeRepository.getPostPublisherDetail(userId)
-      }
-        return job.await()
-
-    }
+//    suspend fun getPostPublisherDetail(userId: String) : User? {
+//      val job = viewModelScope.async {
+//          return@async homeRepository.getPostPublisherDetail(userId)
+//      }
+//        return job.await()
+//
+//    }
 
     private fun sendHomeScreenUiEvent(screenUiEvent: ScreenUiEvent){
         viewModelScope.launch {

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.triperience.features.weatherInfo.data.remote.WeatherApi
+import com.example.triperience.utils.core.CoreRepository
+import com.example.triperience.utils.core.GetPostsPublisher
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -49,5 +51,11 @@ object AppModule {
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetPostsPublisher(coreRepository: CoreRepository) : GetPostsPublisher {
+        return GetPostsPublisher(coreRepository = coreRepository)
     }
 }

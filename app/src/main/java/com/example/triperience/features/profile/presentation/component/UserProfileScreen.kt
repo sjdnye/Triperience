@@ -39,7 +39,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun UserProfileScreen(
     navigator: DestinationsNavigator,
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    userId: String? = null
+    userid: String? = null
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
@@ -125,7 +125,8 @@ fun UserProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(profileHeaderWeightAnimated),
-                        user = user
+                        user = user,
+                        navigator = navigator
                     )
                     Spacer(modifier = Modifier.height(5.dp))
 

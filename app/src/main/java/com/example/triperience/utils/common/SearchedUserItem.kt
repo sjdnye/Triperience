@@ -26,6 +26,7 @@ fun SearchedUserItem(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
+            .padding(top = 8.dp, start = 4.dp)
             .clickable {
                 onClick(user.userid)
             }

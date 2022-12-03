@@ -6,9 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triperience.features.authentication.domain.model.User
+import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.features.search.domain.repository.SearchRepository
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
+import com.example.triperience.utils.core.GetPostsPublisher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,9 +22,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
+    val getPostsPublisher: GetPostsPublisher
 ) : ViewModel() {
 
     var users by mutableStateOf<List<User>>(emptyList())
+        private set
+
+    var posts by mutableStateOf<List<Post>?>(emptyList())
         private set
 
     var isLoading by mutableStateOf(false)
@@ -64,6 +70,32 @@ class SearchScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun searchPostsByCategory(category: String){
+      viewModelScope.launch {
+          searchRepository.searchPostsByCategory(category = category).collect{ result ->
+              when(result){
+                  is Resource.Success -> {
+                      isLoading = false
+                      posts = result.data
+                  }
+                  is Resource.Error -> {
+                      isLoading = false
+                      sendScreenUiEvent(
+                          ScreenUiEvent.ShowMessage(
+                              message = result.message.toString(),
+                              isToast = false
+                          )
+                      )
+                  }
+                  is Resource.Loading -> {
+                      isLoading = true
+                  }
+
+              }
+          }
+      }
     }
 
     private fun sendScreenUiEvent(searchUiEvent: ScreenUiEvent) {

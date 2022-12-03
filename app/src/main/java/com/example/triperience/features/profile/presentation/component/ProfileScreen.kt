@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -31,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.features.authentication.domain.model.User
 import com.example.triperience.features.authentication.presentation.AuthViewModel
 import com.example.triperience.features.destinations.*
+import com.example.triperience.features.profile.domain.model.FollowListItem
 import com.example.triperience.features.profile.presentation.ProfileViewModel
 import com.example.triperience.utils.common.MyPostItem
 import com.example.triperience.utils.common.PostItem
@@ -53,7 +55,7 @@ fun ProfileScreen(
     navigator: DestinationsNavigator,
     authViewModel: AuthViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    userId: String? = null
+    userid: String? = null
 ) {
     val context = LocalContext.current
     val sheetState = rememberBottomSheetState(
@@ -185,7 +187,8 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(profileHeaderWeightAnimated),
-                        user = user
+                        user = user,
+                        navigator = navigator
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -256,7 +259,8 @@ fun ProfileScreen(
 @Composable
 fun ProfileHeader(
     modifier: Modifier = Modifier,
-    user: User
+    user: User,
+    navigator: DestinationsNavigator
 ) {
     Column(
         modifier = modifier
@@ -304,7 +308,18 @@ fun ProfileHeader(
                             fontSize = 10.sp
                         ),
                         textAlign = TextAlign.Start,
-                        modifier = Modifier.align(Bottom)
+                        modifier = Modifier
+                            .align(Bottom)
+                            .clickable {
+                                navigator.navigate(
+                                    FollowListScreenDestination(
+                                        followListItem = FollowListItem(
+                                            title = "Following",
+                                            followList = user.following
+                                        )
+                                    )
+                                )
+                            }
                     )
                     Text(
                         text = "${user.followers.size} followers",
@@ -314,7 +329,18 @@ fun ProfileHeader(
                             fontSize = 10.sp
                         ),
                         textAlign = TextAlign.Start,
-                        modifier = Modifier.align(Bottom)
+                        modifier = Modifier
+                            .align(Bottom)
+                            .clickable {
+                                navigator.navigate(
+                                    FollowListScreenDestination(
+                                        followListItem = FollowListItem(
+                                            title = "Followers",
+                                            followList = user.followers
+                                        )
+                                    )
+                                )
+                            }
                     )
                 }
             }

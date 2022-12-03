@@ -121,7 +121,7 @@ fun CommentScreen(
                             comment = comment,
                             viewModel = commentViewModel,
                             onClick = { userId ->
-                                navigator.navigate(UserProfileScreenDestination(userId = userId))
+                                navigator.navigate(UserProfileScreenDestination(userid = userId))
                             }
                         )
                     }

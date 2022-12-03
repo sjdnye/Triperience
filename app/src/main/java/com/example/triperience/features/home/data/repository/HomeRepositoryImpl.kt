@@ -41,12 +41,12 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPostPublisherDetail(userId: String): User? {
-        val query = firestore.collection(Constants.COLLECTION_USERS)
-            .document(userId)
-            .get()
-            .await()
-
-        return query.toObject(User::class.java)
-    }
+//    override suspend fun getPostPublisherDetail(userId: String): User? {
+//        val query = firestore.collection(Constants.COLLECTION_USERS)
+//            .document(userId)
+//            .get()
+//            .await()
+//
+//        return query.toObject(User::class.java)
+//    }
 }

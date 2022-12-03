@@ -31,6 +31,7 @@ import com.example.triperience.ui.theme.LightBlue300
 import com.example.triperience.ui.theme.LightBlue500
 import com.example.triperience.ui.theme.LightBlue700
 import com.example.triperience.ui.theme.LightBlue900
+import com.example.triperience.utils.core.GetPostsPublisher
 import kotlinx.coroutines.Job
 import javax.inject.Inject
 import kotlin.random.Random
@@ -41,7 +42,7 @@ fun PostItem(
     onProfileClick: (userId: String) -> Unit,
     onImageClick: (latitude: Double, longitude: Double) -> Unit,
     onCommentClick: (postId: String) -> Unit,
-    homeViewModel: HomeViewModel,
+    getPostsPublisher: GetPostsPublisher,
     post: Post
 ) {
     var userProfile by remember {
@@ -53,7 +54,7 @@ fun PostItem(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
-        val publisher = homeViewModel.getPostPublisherDetail(post.publisher)
+        val publisher = getPostsPublisher.getPostPublisherDetail(post.publisher)
         userProfile = publisher?.profileImage
         userName = publisher?.username
     }

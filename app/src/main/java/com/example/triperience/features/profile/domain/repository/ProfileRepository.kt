@@ -32,5 +32,6 @@ interface ProfileRepository {
 
     suspend fun deletePost(postId : String, userId: String) : Flow<Resource<Boolean>>
 
+    suspend fun getFollowListUsers(followList : List<String>) : Flow<Resource<List<User>?>>
 
 }
