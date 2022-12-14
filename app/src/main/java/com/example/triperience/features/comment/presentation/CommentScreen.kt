@@ -61,14 +61,9 @@ fun CommentScreen(
     val context = LocalContext.current
     val bringIntoViewRequester = BringIntoViewRequester()
     val coroutineScope = rememberCoroutineScope()
-    val showSendIcon by remember {
-        mutableStateOf(false)
-    }
 
-    val commentField by remember {
-        mutableStateOf(1f)
-    }
-    val animatedCommentWeight by animateFloatAsState(targetValue = commentField)
+
+
 
     var myComment by remember {
         mutableStateOf("")

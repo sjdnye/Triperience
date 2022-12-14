@@ -24,6 +24,9 @@ object Constants{
     const val FOLLOWING_USER_TEXT = "following"
 
     const val POST_CATEGORY = "postCategory"
+    const val POST_CITY = "city"
+    const val POST_LATITUDE = "latitude"
+    const val POST_LONGITUDE = "longitude"
     const val CATEGORY_SEA = "Sea"
     const val CATEGORY_DESERT = "Desert"
     const val CATEGORY_JUNGLE = "Jungle"

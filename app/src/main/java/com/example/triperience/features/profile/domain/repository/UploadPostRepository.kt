@@ -8,6 +8,4 @@ import kotlinx.coroutines.flow.Flow
 interface UploadPostRepository {
 
     suspend fun uploadPost(post: Post, uri: Uri) : Flow<Resource<Boolean>>
-
-
 }

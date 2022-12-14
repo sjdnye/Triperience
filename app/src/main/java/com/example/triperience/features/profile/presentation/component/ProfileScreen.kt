@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -275,8 +277,9 @@ fun ProfileHeader(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(3.5f),
-                verticalArrangement = Arrangement.Center,
+                    .weight(3.5f)
+                    .align(CenterVertically),
+                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CoilImage(
@@ -285,7 +288,7 @@ fun ProfileHeader(
                         .size(100.dp)
                         .weight(3f)
                 )
-                Spacer(modifier = Modifier.height(5.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = user.username,
                     textAlign = TextAlign.Center,
@@ -293,7 +296,7 @@ fun ProfileHeader(
                         .align(CenterHorizontally)
                         .weight(1f)
                 )
-                Spacer(modifier = Modifier.height(5.dp))
+//                Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -376,7 +379,6 @@ fun ProfileHeader(
                     )
                 }
             }
-
         }
     }
 }
@@ -441,5 +443,7 @@ fun PostSection(
 
 val LazyListState.isScrolled: Boolean
     get() = firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
+
+
 
 

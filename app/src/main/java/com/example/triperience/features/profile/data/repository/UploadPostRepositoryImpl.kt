@@ -20,12 +20,12 @@ class UploadPostRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ): UploadPostRepository {
 
-    override suspend fun uploadPost(post: Post, imageUri: Uri): Flow<Resource<Boolean>> = flow{
+    override suspend fun uploadPost(post: Post, uri: Uri): Flow<Resource<Boolean>> = flow{
         try {
             emit(Resource.Loading())
             val uploadTask = firebaseStorage.reference
                 .child("${Constants.POST_IMAGE_STORAGE_REF}/${post.publisher}/post_${System.currentTimeMillis()}")
-                .putFile(Uri.parse(imageUri.toString())).await()
+                .putFile(Uri.parse(uri.toString())).await()
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
 
             val postId = firestore.collection(Constants.COLLECTION_POST).document().id

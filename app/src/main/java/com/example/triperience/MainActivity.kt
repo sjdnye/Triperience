@@ -19,10 +19,7 @@ import androidx.core.view.updatePadding
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.triperience.features.NavGraphs
-import com.example.triperience.features.destinations.HomeScreenDestination
-import com.example.triperience.features.destinations.ProfileScreenDestination
-import com.example.triperience.features.destinations.SearchScreenDestination
-import com.example.triperience.features.destinations.UserProfileScreenDestination
+import com.example.triperience.features.destinations.*
 import com.example.triperience.ui.theme.TriperienceTheme
 import com.example.triperience.utils.bottomNavigaton.CustomBottomNavBar
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
@@ -53,6 +50,7 @@ class MainActivity : ComponentActivity() {
                 HomeScreenDestination.route,
                 ProfileScreenDestination.route,
                 SearchScreenDestination.route,
+                CategoryScreenDestination.route
             )
 
             TriperienceTheme {

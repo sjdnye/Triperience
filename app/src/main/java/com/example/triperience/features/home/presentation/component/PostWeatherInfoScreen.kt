@@ -24,8 +24,9 @@ import com.example.triperience.features.weatherInfo.presentation.component.Weath
 import com.example.triperience.features.weatherInfo.presentation.component.WeatherForecast
 import com.example.triperience.ui.theme.DarkBlue
 import com.example.triperience.ui.theme.DeepBlue
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostWeatherInfoScreen(
     latitude: Double,
@@ -33,36 +34,31 @@ fun PostWeatherInfoScreen(
     weatherViewModel: WeatherViewModel = hiltViewModel()
 ) {
 
+    val swipeRefreshState =
+        rememberSwipeRefreshState(isRefreshing = weatherViewModel.state.isLoading)
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
-        Column(
+        SwipeRefresh(
             modifier = Modifier
-                .fillMaxSize()
-                .background(DarkBlue)
-        ) {
-            IconButton(
-                onClick = {
-                    weatherViewModel.loadWeatherInfo()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh"
-                )
+                .fillMaxSize(),
+            state = swipeRefreshState,
+            onRefresh = {
+                weatherViewModel.loadWeatherInfo()
             }
-            WeatherCard(state = weatherViewModel.state, backgroundColor = DeepBlue)
-            Spacer(modifier = Modifier.height(16.dp))
-            WeatherForecast(state = weatherViewModel.state)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(DarkBlue)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                WeatherCard(state = weatherViewModel.state, backgroundColor = DeepBlue)
+                Spacer(modifier = Modifier.height(16.dp))
+                WeatherForecast(state = weatherViewModel.state)
 
-        }
-
-        if (weatherViewModel.state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            }
         }
         weatherViewModel.state.error?.let { error ->
             Text(

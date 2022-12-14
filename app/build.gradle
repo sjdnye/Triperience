@@ -23,7 +23,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.triperience"
-        minSdk 23
+        minSdk 26
+        multiDexEnabled true
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -48,6 +49,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+//        coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -156,6 +158,10 @@ dependencies {
 
     //SwipeRefresh
     implementation "com.google.accompanist:accompanist-swiperefresh:0.25.0"
+
+    //Date-Time Picker
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.7.2"
+//    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6'
 
     // Location Services
     implementation 'com.google.android.gms:play-services-location:21.0.1'

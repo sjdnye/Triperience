@@ -14,7 +14,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.triperience.features.home.presentation.PostDetailViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Destination
 @Composable
 fun PostDetailScreen(
@@ -73,5 +72,4 @@ fun PostDetailScreen(
             }
         }
     }
-
 }

@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.triperience.features.weatherInfo.presentation.WeatherState
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeatherForecast(
     state: WeatherState,
@@ -26,7 +25,6 @@ fun WeatherForecast(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = "Today",

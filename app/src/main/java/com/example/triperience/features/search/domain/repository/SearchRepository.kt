@@ -9,5 +9,4 @@ interface SearchRepository {
 
     suspend fun searchUsers(query: String) :Flow<Resource<List<User>?>>
 
-    suspend fun searchPostsByCategory(category: String) : Flow<Resource<List<Post>?>>
 }

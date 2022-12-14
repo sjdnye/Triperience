@@ -1,11 +1,15 @@
 package com.example.triperience.features.profile.presentation
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.triperience.features.profile.domain.location.LocationTracker
 import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.features.profile.domain.model.PostCategory
@@ -13,10 +17,12 @@ import com.example.triperience.features.profile.domain.repository.UploadPostRepo
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,16 +37,27 @@ class UploadPostViewModel @Inject constructor(
     var description by mutableStateOf<String>("")
     var category by mutableStateOf<PostCategory>(PostCategory.Idle)
     var score by mutableStateOf<String>("")
+    var city by mutableStateOf<String>("")
+    var advantage_1 by mutableStateOf("")
+    var advantage_2 by mutableStateOf("")
+    var advantage_3 by mutableStateOf("")
+    var disAdvantage_1 by mutableStateOf("")
+    var disAdvantage_2 by mutableStateOf("")
+    var disAdvantage_3 by mutableStateOf("")
     var imageUri by mutableStateOf<Uri?>(null)
 
     var isLoading by mutableStateOf(false)
+    var locationIsLoading by mutableStateOf(false)
+    var addressList by mutableStateOf<List<Address>?>(null)
+    var jobLocation: Job? = null
+    lateinit var geocoder: Geocoder
 
     private val _uploadEventFlow = MutableSharedFlow<ScreenUiEvent>()
     val uploadEventFlow: SharedFlow<ScreenUiEvent> = _uploadEventFlow
 
-    fun uploadPost() {
+    fun uploadPost(pickedDate: String, pickedTime: String) {
         viewModelScope.launch {
-            if (imageUri != null && latitude != null && longitude != null) {
+            if (imageUri != null && latitude != null && longitude != null && city != "") {
                 uploadPostRepository.uploadPost(
                     uri = imageUri!!,
                     post = Post(
@@ -56,7 +73,12 @@ class UploadPostViewModel @Inject constructor(
                             else -> "Idle"
                         },
                         score = score,
-                        publisher = sharedPrefUtil.getCurrentUser()?.userid!!
+                        publisher = sharedPrefUtil.getCurrentUser()?.userid!!,
+                        city = city,
+                        pickedTime = pickedTime,
+                        pickedDate = pickedDate,
+                        advantages = listOf(advantage_1,advantage_2,advantage_3),
+                        disAdvantages = listOf(disAdvantage_1,disAdvantage_2,disAdvantage_3)
                     )
                 ).collect { result ->
                     when (result) {
@@ -84,7 +106,7 @@ class UploadPostViewModel @Inject constructor(
                 }
             } else {
                 sendEventSharedFlow(
-                    ScreenUiEvent.ShowMessage(message = "Image and coordinates can not be empty!!")
+                    ScreenUiEvent.ShowMessage(message = "Image/city/coordinates can not be empty!!")
                 )
             }
         }
@@ -105,7 +127,50 @@ class UploadPostViewModel @Inject constructor(
         }
     }
 
+    fun getMapLocationByCity( context: Context) {
+        if (city == "") {
+            locationIsLoading = false
+            addressList = emptyList()
+            jobLocation?.cancel()
+            sendEventSharedFlow(
+                ScreenUiEvent.ShowMessage(
+                    message = "Please enter a name for \"city\" field",
+                    isToast = false
+                )
+            )
+        } else {
+            jobLocation?.cancel()
+            jobLocation = viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    // on below line we are getting location from the
+                    // location name and adding that location to address list.
+                    delay(500L)
+                    geocoder = Geocoder(context)
+                    locationIsLoading = true
+                    addressList = geocoder.getFromLocationName(city, 1)
+                    locationIsLoading = false
+                    withContext(Dispatchers.Main){
+                        val address: Address = addressList!![0]
+                        latitude = address.latitude
+                        longitude = address.longitude
+                    }
 
+                } catch (e: IOException) {
+                    withContext(Dispatchers.Main) {
+                        isLoading = false
+                        sendEventSharedFlow(
+                            ScreenUiEvent.ShowMessage(
+                                message = e.message.toString(),
+                                isToast = false
+                            )
+                        )
+                    }
+                    return@launch
+                }
+            }
+        }
+    }
+    
     private fun sendEventSharedFlow(uploadScreenUiEvent: ScreenUiEvent) {
         viewModelScope.launch {
             _uploadEventFlow.emit(uploadScreenUiEvent)

@@ -6,6 +6,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -32,6 +33,10 @@ val bottomNavItems = listOf(
     BottomNavigationItem(
         icon = Icons.Default.Search,
         destination = SearchScreenDestination
+    ),
+    BottomNavigationItem(
+        icon = Icons.Default.Category,
+        destination = CategoryScreenDestination
     ),
     BottomNavigationItem(
         icon = Icons.Default.Person,

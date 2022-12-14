@@ -38,22 +38,5 @@ class SearchRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchPostsByCategory(category: String): Flow<Resource<List<Post>?>> = flow{
-        try {
-            emit(Resource.Loading())
-            val query = firestore.collection(Constants.COLLECTION_POST)
-                .whereEqualTo(Constants.POST_CATEGORY, category.trim())
-                .get()
-                .await()
-            val posts = query.toObjects(Post::class.java)
-            emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
 
-        }catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        }
-    }
 }

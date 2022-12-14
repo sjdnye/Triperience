@@ -1,5 +1,8 @@
 package com.example.triperience.features.authentication.presentation.component
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -7,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomTextField(
@@ -63,20 +67,22 @@ fun CustomTextField2(
 
 ) {
     TextField(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         value = value,
         onValueChange = {
             onValueChange(it)
         },
         label = {
-            Text(text = label)
+            if (placeholder != ""){
+                Text(text = label)
+            }
         },
         placeholder = {
             Text(text = placeholder)
         },
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent,
-            focusedIndicatorColor = MaterialTheme.colors.primary,
+            focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),

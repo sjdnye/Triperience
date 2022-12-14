@@ -30,3 +30,4 @@ val Typography = Typography(
     */
 )
 val customFont = FontFamily(Font(R.font.sweetgentle, FontWeight.Bold))
+val customFont_darlington = FontFamily(Font(R.font.darlington, FontWeight.Bold))

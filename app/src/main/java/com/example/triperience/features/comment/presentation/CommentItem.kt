@@ -28,8 +28,6 @@ fun CommentItem(
     viewModel: CommentViewModel,
     onClick: (userid: String) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState()
 
     var userProfileImage by remember {
         mutableStateOf<String?>(null)
@@ -46,7 +44,6 @@ fun CommentItem(
 
     Column(
         modifier = modifier.padding(4.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
