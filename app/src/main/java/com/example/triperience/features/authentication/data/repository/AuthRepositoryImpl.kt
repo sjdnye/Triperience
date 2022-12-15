@@ -108,7 +108,6 @@ class AuthRepositoryImpl @Inject constructor(
                             .none { it.equals(username, true) }
                     )
                 )
-
             } catch (e: IOException) {
                 emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
             } catch (e: HttpException) {

@@ -46,7 +46,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserPosts(userId: String): Flow<Resource<List<Post>?>> = flow{
+    override suspend fun getUserPosts(userId: String): Flow<Resource<List<Post>?>> = flow {
         try {
             emit(Resource.Loading())
             val query = firestore.collection(Constants.COLLECTION_POST)
@@ -55,7 +55,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 .await()
             val posts = query.toObjects(Post::class.java)
             emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
@@ -88,7 +88,10 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun uploadProfileImage(imageUri: Uri, userid: String): Flow<Resource<Boolean>> = flow{
+    override suspend fun uploadProfileImage(
+        imageUri: Uri,
+        userid: String
+    ): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
         try {
             val uploadTask = firebaseStorage.reference
@@ -96,7 +99,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 .putFile(Uri.parse(imageUri.toString())).await()
 
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
-            val userObj = mutableMapOf<String,String>()
+            val userObj = mutableMapOf<String, String>()
             userObj["profileImage"] = downloadUrl
 
             firestore.collection(Constants.COLLECTION_USERS)
@@ -115,24 +118,39 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun followUser(
-        myId:String,
+        myId: String,
         userid: String
-    ): Flow<Resource<Boolean>> = flow{
+    ): Flow<Resource<Boolean>> = flow {
         try {
             emit(Resource.Loading())
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(myId)
-                .update("following", FieldValue.arrayUnion(userid))
-                .await()
+//            firestore.collection(Constants.COLLECTION_USERS)
+//                .document(myId)
+//                .update("following", FieldValue.arrayUnion(userid))
+//                .await()
+//
+//            firestore.collection(Constants.COLLECTION_USERS)
+//                .document(userid)
+//                .update("followers", FieldValue.arrayUnion(myId))
+//                .await()
+            firestore.runBatch { batch ->
+                batch.update(
+                    firestore.collection(Constants.COLLECTION_USERS)
+                        .document(myId),
+                    "following",
+                    FieldValue.arrayUnion(userid)
+                )
 
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(userid)
-                .update("followers", FieldValue.arrayUnion(myId))
-                .await()
+                batch.update(
+                    firestore.collection(Constants.COLLECTION_USERS)
+                        .document(userid),
+                    "followers",
+                    FieldValue.arrayUnion(myId)
+                )
+            }.await()
 
             emit(Resource.Success(data = true))
 
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
@@ -141,72 +159,107 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun unFollowUser(myId: String, userid: String): Flow<Resource<Boolean>> = flow {
-        try {
-            emit(Resource.Loading())
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(myId)
-                .update("following",FieldValue.arrayRemove(userid))
-                .await()
+    override suspend fun unFollowUser(myId: String, userid: String): Flow<Resource<Boolean>> =
+        flow {
+            try {
+                emit(Resource.Loading())
+//                firestore.collection(Constants.COLLECTION_USERS)
+//                    .document(myId)
+//                    .update("following", FieldValue.arrayRemove(userid))
+//                    .await()
+//
+//                firestore.collection(Constants.COLLECTION_USERS)
+//                    .document(userid)
+//                    .update("followers", FieldValue.arrayRemove(myId))
+//                    .await()
 
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(userid)
-                .update("followers", FieldValue.arrayRemove(myId))
-                .await()
+                firestore.runBatch { batch ->
 
-            emit(Resource.Success(data = true))
+                    batch.update(
+                        firestore.collection(Constants.COLLECTION_USERS)
+                            .document(myId),
+                        "following",
+                        FieldValue.arrayRemove(userid)
+                    )
 
-        }catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        }
-    }
+                    batch.update(
+                        firestore.collection(Constants.COLLECTION_USERS)
+                            .document(userid),
+                        "followers",
+                        FieldValue.arrayRemove(myId)
+                    )
+                }.await()
 
-    override suspend fun deletePost(postId: String, userId: String): Flow<Resource<Boolean>> = flow{
-        try {
-            emit(Resource.Loading())
-            firestore.collection(Constants.COLLECTION_POST)
-                .document(postId)
-                .delete()
-                .await()
+                emit(Resource.Success(data = true))
 
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(userId)
-                .update("posts", FieldValue.arrayRemove(postId))
-                .await()
-
-            emit(Resource.Success(data = true))
-
-        }catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: IOException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            }
         }
 
-    }
+    override suspend fun deletePost(postId: String, userId: String): Flow<Resource<Boolean>> =
+        flow {
+            try {
+                emit(Resource.Loading())
 
-    override suspend fun getFollowListUsers(followList: List<String>): Flow<Resource<List<User>?>>  = flow{
-        try {
-            emit(Resource.Loading())
-            val query = firestore.collection(Constants.COLLECTION_USERS)
-                .whereIn(Constants.USER_ID, followList)
-                .get()
-                .await()
+//                firestore.collection(Constants.COLLECTION_POST)
+//                    .document(postId)
+//                    .delete()
+//                    .await()
+//
+//                firestore.collection(Constants.COLLECTION_USERS)
+//                    .document(userId)
+//                    .update("posts", FieldValue.arrayRemove(postId))
+//                    .await()
 
-            val result = query.toObjects(User::class.java)
-            emit(Resource.Success(result.sortedBy { it.username }))
+                firestore.runBatch { batch ->
+                    batch.delete(
+                        firestore.collection(Constants.COLLECTION_POST)
+                            .document(postId)
+                    )
 
-        }catch (e: IOException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: HttpException) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
-        } catch (e: Exception) {
-            emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+                    batch.update(
+                        firestore.collection(Constants.COLLECTION_USERS)
+                            .document(userId),
+                        "posts",
+                        FieldValue.arrayRemove(postId)
+                    )
+                }.await()
+
+                emit(Resource.Success(data = true))
+
+            } catch (e: IOException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            }
+
         }
-    }
+
+    override suspend fun getFollowListUsers(followList: List<String>): Flow<Resource<List<User>?>> =
+        flow {
+            try {
+                emit(Resource.Loading())
+                val query = firestore.collection(Constants.COLLECTION_USERS)
+                    .whereIn(Constants.USER_ID, followList)
+                    .get()
+                    .await()
+
+                val result = query.toObjects(User::class.java)
+                emit(Resource.Success(result.sortedBy { it.username }))
+
+            } catch (e: IOException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            }
+        }
 }

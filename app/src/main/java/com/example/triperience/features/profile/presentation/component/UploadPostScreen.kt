@@ -127,7 +127,16 @@ fun UploadPostScreen(
     val mDatePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            formattedDate = "${mYear}.${mMonth + 1}.${mDayOfMonth}"
+            var month = (mMonth + 1).toString()
+            var day = mDayOfMonth.toString()
+            if (mMonth + 1 < 10){
+                month = "0${mMonth + 1}"
+            }
+            if (mDayOfMonth < 10){
+                day = "0$mDayOfMonth"
+            }
+
+            formattedDate = "${mYear}.${month}.${day}"
         }, mYear, mMonth, mDay
     )
 
@@ -143,7 +152,15 @@ fun UploadPostScreen(
     val mTimePickerDialog = TimePickerDialog(
         context,
         { _, mHour: Int, mMinute: Int ->
-            formattedTime = "$mHour:$mMinute"
+            var hour = mHour.toString()
+            var minute = mMinute.toString()
+           if (mHour < 10){
+               hour = "0$mHour"
+           }
+            if (mMinute < 10){
+                minute = "0$mMinute"
+            }
+            formattedTime = "$hour:$minute"
         }, mHour, mMinute, true
     )
 
@@ -280,36 +297,44 @@ fun UploadPostScreen(
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Auto",
-                            color = MaterialTheme.colors.primary,
-                            modifier = Modifier
-                                .clickable {
-                                    if (locationCoarsePermission.status.isGranted && locationFinePermission.status.isGranted) {
-                                        viewModel.getCurrentLocation()
-                                    } else if (locationCoarsePermission.status.shouldShowRationale || locationFinePermission.status.shouldShowRationale) {
-                                        showLocationPermissionRationale.value =
-                                            showLocationPermissionRationale.value.copy(
-                                                showDialog = true,
-                                                message = "Triperience Requires this geoLocation permission to access your location.",
-                                                imageVector = Icons.Filled.MyLocation,
-                                                permission = Constants.LOCATION
-                                            )
-                                    } else {
-                                        locationCoarsePermission.launchPermissionRequest()
-                                        locationFinePermission.launchPermissionRequest()
+                        if (viewModel.locationIsLoading && viewModel.locationSwitchFlag == 1){
+                            CircularProgressIndicator(modifier = Modifier.align(CenterHorizontally).wrapContentSize().size(20.dp))
+                        }else{
+                            Text(
+                                text = "Auto",
+                                color = MaterialTheme.colors.primary,
+                                modifier = Modifier
+                                    .clickable {
+                                        if (locationCoarsePermission.status.isGranted && locationFinePermission.status.isGranted) {
+                                            viewModel.getCurrentLocation()
+                                        } else if (locationCoarsePermission.status.shouldShowRationale || locationFinePermission.status.shouldShowRationale) {
+                                            showLocationPermissionRationale.value =
+                                                showLocationPermissionRationale.value.copy(
+                                                    showDialog = true,
+                                                    message = "Triperience Requires this geoLocation permission to access your location.",
+                                                    imageVector = Icons.Filled.MyLocation,
+                                                    permission = Constants.LOCATION
+                                                )
+                                        } else {
+                                            locationCoarsePermission.launchPermissionRequest()
+                                            locationFinePermission.launchPermissionRequest()
+                                        }
                                     }
-                                }
-                        )
+                            )
+                        }
                         Divider(modifier = Modifier.fillMaxWidth())
-                        Text(
-                            text = "By city",
-                            color = MaterialTheme.colors.primary,
-                            modifier = Modifier
-                                .clickable {
-                                    viewModel.getMapLocationByCity(context = context)
-                                }
-                        )
+                        if (viewModel.locationIsLoading && viewModel.locationSwitchFlag == 2){
+                            CircularProgressIndicator(modifier = Modifier.align(CenterHorizontally).wrapContentSize().size(20.dp))
+                        }else{
+                            Text(
+                                text = "By city",
+                                color = MaterialTheme.colors.primary,
+                                modifier = Modifier
+                                    .clickable {
+                                        viewModel.getMapLocationByCity(context = context)
+                                    }
+                            )
+                        }
                     }
                     Row(
                         modifier = Modifier.weight(2f),
@@ -492,7 +517,8 @@ fun UploadPostScreen(
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .size(20.dp),
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {

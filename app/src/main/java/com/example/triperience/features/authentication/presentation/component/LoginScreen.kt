@@ -173,7 +173,8 @@ fun LoginScreen(
                         onDone = {
                             focusManager.clearFocus()
                         }
-                    )
+                    ),
+                    maxLine = 3
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 TextField(
@@ -243,7 +244,8 @@ fun LoginScreen(
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .align(CenterVertically)
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .size(20.dp),
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {
@@ -257,45 +259,4 @@ fun LoginScreen(
         }
     }
 }
-
-
-//                TextField(
-//                    value = email,
-//                    onValueChange = {
-//                        email = it
-//                    },
-//                    modifier = Modifier
-//                        .onFocusEvent { event ->
-//                            if (event.isFocused) {
-//                                coroutineScope.launch {
-//                                    bringIntoViewRequester.bringIntoView()
-//                                }
-//                            }
-//                        }
-//                        .fillMaxWidth(),
-//                    colors = TextFieldDefaults.textFieldColors(
-//                        backgroundColor = Color.Transparent,
-//                        focusedIndicatorColor = MaterialTheme.colors.primary,
-//                        unfocusedIndicatorColor = Color.Transparent,
-//                        disabledIndicatorColor = Color.Transparent
-//                    ),
-//                    label = {
-//                        Text(text = "Email")
-//                    },
-//                    placeholder = {
-//                        Text(text = "Enter email")
-//                    },
-//                    leadingIcon = {
-//                        Icon(imageVector = Icons.Default.Email, contentDescription = "enter email")
-//                    },
-//                    keyboardOptions = KeyboardOptions(
-//                        keyboardType = KeyboardType.Email,
-//                        imeAction = ImeAction.Done
-//                    ),
-//                    keyboardActions = KeyboardActions(
-//                        onDone = {
-//                            focusManager.clearFocus()
-//                        }
-//                    )
-//                )
 

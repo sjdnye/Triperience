@@ -18,9 +18,9 @@ import javax.inject.Inject
 class UploadPostRepositoryImpl @Inject constructor(
     private val firebaseStorage: FirebaseStorage,
     private val firestore: FirebaseFirestore
-): UploadPostRepository {
+) : UploadPostRepository {
 
-    override suspend fun uploadPost(post: Post, uri: Uri): Flow<Resource<Boolean>> = flow{
+    override suspend fun uploadPost(post: Post, uri: Uri): Flow<Resource<Boolean>> = flow {
         try {
             emit(Resource.Loading())
             val uploadTask = firebaseStorage.reference
@@ -33,18 +33,33 @@ class UploadPostRepositoryImpl @Inject constructor(
             post.postId = postId
             post.dateTime = System.currentTimeMillis()
 
-            firestore.collection(Constants.COLLECTION_POST)
-                .document(post.postId)
-                .set(post)
-                .await()
+//            firestore.collection(Constants.COLLECTION_POST)
+//                .document(post.postId)
+//                .set(post)
+//                .await()
+//
+//            firestore.collection(Constants.COLLECTION_USERS)
+//                .document(post.publisher)
+//                .update("posts", FieldValue.arrayUnion(postId))
+//                .await()
 
-            firestore.collection(Constants.COLLECTION_USERS)
-                .document(post.publisher)
-                .update("posts", FieldValue.arrayUnion(postId))
-                .await()
+            firestore.runBatch { batch ->
+                batch.set(
+                    firestore.collection(Constants.COLLECTION_POST)
+                        .document(post.postId),
+                    post
+                )
+
+                batch.update(
+                    firestore.collection(Constants.COLLECTION_USERS)
+                        .document(post.publisher),
+                    "posts",
+                    FieldValue.arrayUnion(postId)
+                )
+            }.await()
 
             emit(Resource.Success(data = true))
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))

@@ -19,12 +19,13 @@ kotlin {
 }
 
 android {
+    lintOptions {
+        checkReleaseBuilds false
+    }
     compileSdk 32
-
     defaultConfig {
         applicationId "com.example.triperience"
         minSdk 26
-        multiDexEnabled true
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -42,14 +43,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-//        coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = '1.8'

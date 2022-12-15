@@ -40,13 +40,4 @@ class HomeRepositoryImpl @Inject constructor(
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         }
     }
-
-//    override suspend fun getPostPublisherDetail(userId: String): User? {
-//        val query = firestore.collection(Constants.COLLECTION_USERS)
-//            .document(userId)
-//            .get()
-//            .await()
-//
-//        return query.toObject(User::class.java)
-//    }
 }

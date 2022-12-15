@@ -37,6 +37,4 @@ class SearchRepositoryImpl @Inject constructor(
             emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
         }
     }
-
-
 }

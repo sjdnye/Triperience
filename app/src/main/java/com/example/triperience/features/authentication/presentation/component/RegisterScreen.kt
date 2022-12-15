@@ -198,7 +198,8 @@ fun RegisterScreen(
                         onDone = {
                             focusManager.clearFocus()
                         }
-                    )
+                    ),
+                    maxLine = 3
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 TextField(
@@ -320,7 +321,9 @@ fun RegisterScreen(
                 ) {
                     if (viewModel.isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(CenterVertically),
+                            modifier = Modifier
+                                .align(CenterVertically)
+                                .size(20.dp),
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {

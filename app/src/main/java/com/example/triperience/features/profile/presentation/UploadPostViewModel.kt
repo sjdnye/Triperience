@@ -48,6 +48,7 @@ class UploadPostViewModel @Inject constructor(
 
     var isLoading by mutableStateOf(false)
     var locationIsLoading by mutableStateOf(false)
+    var locationSwitchFlag by mutableStateOf(0)
     var addressList by mutableStateOf<List<Address>?>(null)
     var jobLocation: Job? = null
     lateinit var geocoder: Geocoder
@@ -113,11 +114,15 @@ class UploadPostViewModel @Inject constructor(
     }
 
     fun getCurrentLocation() {
+        locationIsLoading = true
+        locationSwitchFlag = 1
         viewModelScope.launch {
             locationTracker.getCurrentLocation()?.let { location ->
+                locationIsLoading = false
                 latitude = location.latitude
                 longitude = location.longitude
             } ?: kotlin.run {
+                locationIsLoading = false
                 sendEventSharedFlow(
                     ScreenUiEvent.ShowMessage(
                         message = "Couldn't retrieve location. Make sure to grant permission and enable GPS."
@@ -134,7 +139,7 @@ class UploadPostViewModel @Inject constructor(
             jobLocation?.cancel()
             sendEventSharedFlow(
                 ScreenUiEvent.ShowMessage(
-                    message = "Please enter a name for \"city\" field",
+                    message = "Please fill the \"city\" field",
                     isToast = false
                 )
             )
@@ -147,6 +152,7 @@ class UploadPostViewModel @Inject constructor(
                     delay(500L)
                     geocoder = Geocoder(context)
                     locationIsLoading = true
+                    locationSwitchFlag = 2
                     addressList = geocoder.getFromLocationName(city, 1)
                     locationIsLoading = false
                     withContext(Dispatchers.Main){
@@ -157,7 +163,7 @@ class UploadPostViewModel @Inject constructor(
 
                 } catch (e: IOException) {
                     withContext(Dispatchers.Main) {
-                        isLoading = false
+                        locationIsLoading = false
                         sendEventSharedFlow(
                             ScreenUiEvent.ShowMessage(
                                 message = e.message.toString(),

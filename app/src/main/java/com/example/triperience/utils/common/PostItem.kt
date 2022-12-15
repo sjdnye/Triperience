@@ -117,6 +117,34 @@ fun PostItem(
 }
 
 @Composable
+fun PostPublisherSection(
+    post: Post,
+    userProfile: String?,
+    userName: String?,
+    onProfileClick: (postPublisher: String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                //go to profile page of user
+                onProfileClick(post.publisher)
+            }
+    ) {
+        //publisherProfile
+        CoilImage(
+            imageUrl = if (userProfile != null) userProfile!! else "",
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = if (userName != null) userName!! else "",
+            fontSize = 15.sp
+        )
+    }
+}
+
+@Composable
 fun PostImageSection(
     post: Post,
     onImageClick: (latitude: Double, longitude: Double) -> Unit
@@ -146,104 +174,63 @@ fun PostImageSection(
             modifier = Modifier
                 .align(BottomStart)
                 .padding(start = 5.dp),
+            color = MaterialTheme.colors.primary,
             fontFamily = customFont
         )
     }
 }
 
 @Composable
-fun PostExpandedSection(
+fun PostRateAndCitySection(
     post: Post
 ) {
-    Column(
-        modifier = Modifier,
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.Start
-    )
-    {
-        Column() {
-            post.advantages.forEach {
-                if (it != "") {
-                    Row {
-                        Text(text = "+ ", color = Color.Green)
-                        Text(text = it, fontSize = 15.sp)
-
-                    }
-                }
-            }
-        }
-        Column {
-            post.disAdvantages.forEach {
-                if (it != "") {
-                    Row {
-                        Text(text = "- ", color = Color.Red)
-                        Text(text = it, fontSize = 15.sp)
-
-                    }
-                }
-            }
-        }
-
-        if (post.description != "") {
-            Column {
+    if (post.score != "") {
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Row {
                 Text(
-                    text = "Caption :\n${post.description}",
-                    fontSize = 15.sp
+                    text = "Score: ",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.align(CenterVertically)
+                )
+                Text(
+                    text = "${post.score}/10",
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.align(CenterVertically),
+                    fontSize = 15.sp,
+                    color = if (post.score.toInt() <= 3) Color.Red else if (post.score.toInt() <= 6) LightPink800 else if (post.score.toInt() <= 9) LightGreen800 else LightYellow500
                 )
             }
+            Row {
+                val starCount = post.score.toInt() / 2
+                val starCountHalf = post.score.toDouble() % 2
+                if (starCount > 0) {
+                    (0 until starCount).forEach {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "",
+                            tint = Color.Yellow,
+                            modifier = Modifier.align(CenterVertically),
+                        )
+                    }
+                }
+                if (starCountHalf > 0) {
+                    Icon(
+                        imageVector = Icons.Default.StarHalf,
+                        contentDescription = "",
+                        tint = Color.Yellow,
+                        modifier = Modifier.align(CenterVertically),
+                    )
+                }
+            }
         }
     }
-}
-
-@Composable
-fun PostPublisherSection(
-    post: Post,
-    userProfile: String?,
-    userName: String?,
-    onProfileClick: (postPublisher: String) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                //go to profile page of user
-                onProfileClick(post.publisher)
-            }
-    ) {
-        //publisherProfile
-        CoilImage(
-            imageUrl = if (userProfile != null) userProfile!! else "",
-            modifier = Modifier.size(32.dp)
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = if (userName != null) userName!! else "",
-            fontSize = 15.sp
-        )
-    }
-}
-
-@Composable
-fun PostTimeAndCommentSection(
-    post: Post,
-    onCommentClick: (postId: String) -> Unit
-) {
-    Text(
-        text = SimpleConvert.convertLongToDate(post.dateTime!!),
-        fontSize = 10.sp
-    )
-    Spacer(modifier = Modifier.height(4.dp))
-    Text(
-        text = "Comments",
-        color = Color.Gray,
-        fontSize = 10.sp,
-        modifier = Modifier
-            .clickable {
-                //go to comment section
-                onCommentClick(post.postId)
-            }
-
-    )
 }
 
 @Composable
@@ -292,54 +279,68 @@ fun PostDateAndTimeSection(
 }
 
 @Composable
-fun PostRateAndCitySection(
+fun PostExpandedSection(
     post: Post
 ) {
-    if (post.score != "") {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            Row {
-                Text(
-                    text = "Score: ",
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.align(CenterVertically).padding(start = 20.dp)
-                )
-                Text(
-                    text = "${post.score}/10",
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.align(CenterVertically),
-                    fontSize = 15.sp,
-                    color = if (post.score.toInt() <= 3) Color.Red else if (post.score.toInt() <= 6) LightPink800 else if (post.score.toInt() <= 9) LightGreen800 else LightYellow500
-                )
-            }
-            Row {
-                val starCount = post.score.toInt() / 2
-                val starCountHalf = post.score.toDouble() % 2
-                if (starCount > 0) {
-                    (0 until starCount).forEach {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "",
-                            tint = Color.Yellow,
-                            modifier = Modifier.align(CenterVertically),
-                        )
+    Column(
+        modifier = Modifier,
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.Start
+    )
+    {
+        Column() {
+            post.advantages.forEach {
+                if (it != "") {
+                    Row {
+                        Text(text = "+ ", color = Color.Green)
+                        Text(text = it, fontSize = 15.sp)
+
                     }
-                }
-                if (starCountHalf > 0) {
-                    Icon(
-                        imageVector = Icons.Default.StarHalf,
-                        contentDescription = "",
-                        tint = Color.Yellow,
-                        modifier = Modifier.align(CenterVertically),
-                    )
                 }
             }
         }
+        Column {
+            post.disAdvantages.forEach {
+                if (it != "") {
+                    Row {
+                        Text(text = "- ", color = Color.Red)
+                        Text(text = it, fontSize = 15.sp)
+
+                    }
+                }
+            }
+        }
+
+        if (post.description != "") {
+            Column {
+                Text(
+                    text = "Caption :\n${post.description}",
+                    fontSize = 15.sp
+                )
+            }
+        }
     }
+}
+
+@Composable
+fun PostTimeAndCommentSection(
+    post: Post,
+    onCommentClick: (postId: String) -> Unit
+) {
+    Text(
+        text = SimpleConvert.convertLongToDate(post.dateTime!!),
+        fontSize = 10.sp
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        text = "Comments",
+        color = Color.Gray,
+        fontSize = 10.sp,
+        modifier = Modifier
+            .clickable {
+                //go to comment section
+                onCommentClick(post.postId)
+            }
+
+    )
 }
