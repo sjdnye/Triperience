@@ -35,6 +35,6 @@ fun SimpleAlertDialog(
             ) { Text(text = "No") }
         },
         title = { Text(text = title) },
-        text = { Text(text = description) }
+        text = { Text(text = description) },
     )
 }

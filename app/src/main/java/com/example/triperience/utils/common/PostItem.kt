@@ -9,11 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -76,14 +76,19 @@ fun PostItem(
                 onImageClick(latitude, longitude)
             }
         )
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
-            PostRateAndCitySection(post = post)
-            PostDateAndTimeSection(post = post)
+
+            PostRateAndDateSection(post = post)
+            Spacer(modifier = Modifier.height(2.dp))
+            PostStarAndTimeSection(post = post)
+
         }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -181,33 +186,65 @@ fun PostImageSection(
 }
 
 @Composable
-fun PostRateAndCitySection(
+fun PostRateAndDateSection(
     post: Post
 ) {
-    if (post.score != "") {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            Row {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        if (post.score != "") {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
                     text = "Score: ",
                     fontSize = 15.sp,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.align(CenterVertically)
+                    textAlign = TextAlign.Center
                 )
                 Text(
                     text = "${post.score}/10",
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.align(CenterVertically),
                     fontSize = 15.sp,
+                    textAlign = TextAlign.Center,
                     color = if (post.score.toInt() <= 3) Color.Red else if (post.score.toInt() <= 6) LightPink800 else if (post.score.toInt() <= 9) LightGreen800 else LightYellow500
                 )
             }
-            Row {
+        }
+        if (post.pickedDate != "") {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = CenterHorizontally
+            ) {
+                Text(
+                    text = "Date",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+
+                )
+                Text(
+                    text = post.pickedDate,
+                    textAlign = TextAlign.Center
+
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun PostStarAndTimeSection(
+    post: Post
+) {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (post.score != "") {
                 val starCount = post.score.toInt() / 2
                 val starCountHalf = post.score.toDouble() % 2
                 if (starCount > 0) {
@@ -230,39 +267,12 @@ fun PostRateAndCitySection(
                 }
             }
         }
-    }
-}
 
-@Composable
-fun PostDateAndTimeSection(
-    post: Post
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        if (post.pickedDate != "") {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Date",
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = post.pickedDate,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        if (post.pickedTime != "") {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = CenterHorizontally
+        ) {
+            if (post.pickedTime != "") {
                 Text(
                     text = "Time",
                     fontSize = 15.sp,
@@ -274,7 +284,6 @@ fun PostDateAndTimeSection(
                 )
             }
         }
-
     }
 }
 
@@ -344,3 +353,7 @@ fun PostTimeAndCommentSection(
 
     )
 }
+
+
+
+

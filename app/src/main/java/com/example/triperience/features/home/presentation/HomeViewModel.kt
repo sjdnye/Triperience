@@ -13,6 +13,7 @@ import com.example.triperience.utils.common.screen_ui_event.ScreenUiEvent
 import com.example.triperience.utils.core.GetPostsPublisher
 import com.example.triperience.utils.shared_preferences.SharedPrefUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -43,25 +44,25 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getPosts() {
-       viewModelScope.launch {
-           homeRepository.getRelevantPost(followingList = meUser?.following!!).collect{result ->
-               when(result){
-                   is Resource.Success -> {
-                       isLoading = false
-                       _posts.value = result.data
-                   }
-                   is Resource.Error -> {
-                       isLoading = false
-                       sendHomeScreenUiEvent(
-                           ScreenUiEvent.ShowMessage(message = result.message.toString(), isToast = true)
-                       )
-                   }
-                   is Resource.Loading -> {
-                       isLoading = true
-                   }
-               }
-           }
-       }
+        viewModelScope.launch {
+            homeRepository.getRelevantPost(followingList = meUser?.following!!).collect{result ->
+                when(result){
+                    is Resource.Success -> {
+                        isLoading = false
+                        _posts.value = result.data
+                    }
+                    is Resource.Error -> {
+                        isLoading = false
+                        sendHomeScreenUiEvent(
+                            ScreenUiEvent.ShowMessage(message = result.message.toString(), isToast = true)
+                        )
+                    }
+                    is Resource.Loading -> {
+                        isLoading = true
+                    }
+                }
+            }
+        }
 
     }
 

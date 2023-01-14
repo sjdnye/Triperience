@@ -9,6 +9,8 @@ import com.example.triperience.features.profile.domain.repository.ProfileReposit
 import com.example.triperience.utils.Constants
 import com.example.triperience.utils.Resource
 import com.example.triperience.utils.await
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -44,6 +46,7 @@ class ProfileRepositoryImpl @Inject constructor(
         awaitClose {
             snapShotListener.remove()
         }
+
     }
 
     override suspend fun getUserPosts(userId: String): Flow<Resource<List<Post>?>> = flow {
@@ -261,5 +264,65 @@ class ProfileRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
             }
+        }
+
+    override suspend fun changePassword(oldPass: String, newPass: String): Flow<Resource<Boolean>> =
+        flow {
+            try {
+                emit(Resource.Loading())
+
+                val user = auth.currentUser
+                val userEmail = user?.email
+                val credential: AuthCredential =
+                    EmailAuthProvider.getCredential(userEmail!!, oldPass)
+
+                user.reauthenticate(credential).await()
+                user.updatePassword(newPass).await()
+
+
+                emit(Resource.Success(data = true))
+
+
+            } catch (e: IOException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            }
+        }
+
+    override suspend fun changeEmail(
+        oldPass: String,
+        newEmail: String,
+        userid: String
+    ): Flow<Resource<Boolean>> =
+        flow {
+            try {
+                emit(Resource.Loading())
+                val userObj = mutableMapOf<String, String>()
+                val user = auth.currentUser
+                val userEmail = user?.email
+                val credential: AuthCredential =
+                    EmailAuthProvider.getCredential(userEmail!!, oldPass)
+
+                user.reauthenticate(credential).await()
+                user.updateEmail(newEmail).await()
+
+                userObj["email"] = newEmail
+                firestore.collection(Constants.COLLECTION_USERS)
+                    .document(userid)
+                    .update(userObj as Map<String, Any>)
+                    .await()
+
+                emit(Resource.Success(data = true))
+            } catch (e: IOException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage ?: "Something went wrong!"))
+            }
+
         }
 }

@@ -1,7 +1,7 @@
 package com.example.triperience.features.profile.presentation
 
 import android.net.Uri
-import android.util.Log
+import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,9 +20,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +45,8 @@ class ProfileViewModel @Inject constructor(
 
     var showDeletePostDialog by mutableStateOf(false)
     var deletedPost by mutableStateOf<String?>(null)
+
+    var showCustomDialog by mutableStateOf(false)
 
     var isShowFollowButton by mutableStateOf(false)
 
@@ -119,53 +120,62 @@ class ProfileViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 state = state.copy(isLoading = true)
-                authRepository.checkUsernameAvailability(username = username).collect { response ->
-                    when (response) {
-                        is Resource.Success -> {
-                            if (response.data == true) {
-                                profileRepository.setUserInformation(
-                                    userid = state.user?.userid!!,
-                                    userName = username,
-                                    bio = bio
-                                ).collect { result ->
-                                    when (result) {
-                                        is Resource.Success -> {
-                                            state = state.copy(isLoading = false)
-                                            sendProfileUiEvent(
-                                                ScreenUiEvent.ShowMessage(
-                                                    message = "Profile updated successfully!",
-                                                    isToast = true
-                                                )
-                                            )
-
-                                        }
-                                        is Resource.Error -> {
-                                            state = state.copy(isLoading = false)
-                                            sendProfileUiEvent(
-                                                ScreenUiEvent.ShowMessage(
-                                                    message = result.message.toString()
-                                                )
-                                            )
-                                        }
-                                        is Resource.Loading -> {
-                                            state = state.copy(isLoading = true)
-                                        }
-                                    }
+                if (username != meUser?.username){
+                    authRepository.checkUsernameAvailability(username = username).collect { response ->
+                        when (response) {
+                            is Resource.Success -> {
+                                if (response.data == true) {
+                                    setUsernameAndBio(username = username, bio = bio)
+                                } else {
+                                    state = state.copy(isLoading = false)
+                                    sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "This username is already exists!"))
                                 }
 
-                            } else {
-                                state = state.copy(isLoading = false)
-                                sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "This username is already exists!"))
                             }
+                            is Resource.Error -> {
+                                state = state.copy(isLoading = false)
+                                sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = response.message.toString()))
+                            }
+                            else -> {}
+                        }
 
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(isLoading = false)
-                            sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = response.message.toString()))
-                        }
-                        else -> {}
                     }
+                }
+                else{
+                    setUsernameAndBio(username = username, bio = bio)
+                }
+            }
+        }
+    }
+    private fun setUsernameAndBio(username: String, bio: String){
+        viewModelScope.launch {
+            profileRepository.setUserInformation(
+                userid = state.user?.userid!!,
+                userName = username,
+                bio = bio
+            ).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        state = state.copy(isLoading = false)
+                        sendProfileUiEvent(
+                            ScreenUiEvent.ShowMessage(
+                                message = "Profile updated successfully!",
+                                isToast = true
+                            )
+                        )
 
+                    }
+                    is Resource.Error -> {
+                        state = state.copy(isLoading = false)
+                        sendProfileUiEvent(
+                            ScreenUiEvent.ShowMessage(
+                                message = result.message.toString()
+                            )
+                        )
+                    }
+                    is Resource.Loading -> {
+                        state = state.copy(isLoading = true)
+                    }
                 }
             }
         }
@@ -303,6 +313,68 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun changePassword(oldPass:String, newPass:String, confirmPass:String){
+        viewModelScope.launch {
+          if (oldPass.isNotBlank() && newPass.isNotBlank() && confirmPass.isNotBlank()){
+              if (newPass.trim() == confirmPass.trim()){
+                  showCustomDialog = false
+                  profileRepository.changePassword(oldPass = oldPass.trim(), newPass = newPass.trim()).collect{result ->
+                      when(result){
+                          is Resource.Success -> {
+                              state = state.copy(isLoading = false)
+                              sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Password changed successfully!", isToast = true))
+                          }
+                          is Resource.Error -> {
+                              state = state.copy(isLoading = false)
+                              sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message ?: "Something went wrong"))
+
+                          }
+                          is Resource.Loading -> {
+                              state = state.copy(isLoading = true)
+                          }
+                      }
+                  }
+
+              }else{
+                  sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Password and confirm password are not equal"))
+              }
+          }else{
+              sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Fields can not be empty!"))
+          }
+        }
+    }
+
+    fun changeEmail(oldPass: String, newEmail:String){
+        viewModelScope.launch {
+          if (oldPass.isNotBlank() && newEmail.isNotBlank()){
+              if (Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()){
+                  showCustomDialog = false
+                    profileRepository.changeEmail(oldPass = oldPass, newEmail = newEmail, userid = meUser!!.userid).collect{result ->
+                        when(result){
+                            is Resource.Success -> {
+                                state = state.copy(isLoading = false)
+                                sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Email changed successfully!", isToast = true))
+                            }
+                            is Resource.Error -> {
+                                state = state.copy(isLoading = false)
+                                sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = result.message!!))
+
+
+                            }
+                            is Resource.Loading -> {
+                                state = state.copy(isLoading = true)
+                            }
+                        }
+                    }
+              }else{
+                  sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Your email is not valid"))
+              }
+          }else{
+              sendProfileUiEvent(ScreenUiEvent.ShowMessage(message = "Fields can not be empty!"))
+          }
         }
     }
 

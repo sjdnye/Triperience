@@ -20,14 +20,10 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     var isUserAuthenticated by mutableStateOf(false)
-
-
     var isLoading by mutableStateOf(false)
         private set
-
     private val _authEventFlow = MutableSharedFlow<AuthenticationUiEvent>()
     val authEventFlow = _authEventFlow.asSharedFlow()
-
 
     init {
 
@@ -69,7 +65,6 @@ class AuthViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
-                        println("Error has occurred")
                         sendAuthUiEvent(
                             AuthenticationUiEvent.ShowMessage(message = result.message.toString())
                         )

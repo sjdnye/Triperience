@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -75,7 +76,7 @@ class UploadPostViewModel @Inject constructor(
                         },
                         score = score,
                         publisher = sharedPrefUtil.getCurrentUser()?.userid!!,
-                        city = city,
+                        city = city.trim().lowercase(),
                         pickedTime = pickedTime,
                         pickedDate = pickedDate,
                         advantages = listOf(advantage_1,advantage_2,advantage_3),

@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -65,6 +66,10 @@ fun EditScreen(
     }
     var bio by remember {
         mutableStateOf(viewModel.meUser?.bio!!)
+    }
+
+    var customAlertDialogType by remember {
+        mutableStateOf<Int>(1)
     }
 
     LaunchedEffect(key1 = true) {
@@ -129,7 +134,10 @@ fun EditScreen(
                     IconButton(
                         onClick = {
                             keyboardController?.hide()
-                            viewModel.setUserInformation(username = username, bio = bio)
+                            viewModel.setUserInformation(
+                                username = username.trim().lowercase(),
+                                bio = bio
+                            )
 
                         },
                         modifier = Modifier.wrapContentHeight()
@@ -196,8 +204,7 @@ fun EditScreen(
                                 .clickable {
                                     viewModel.uploadImageProfile(imageUrl = imageUri!!)
                                 },
-
-                            )
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
@@ -237,6 +244,69 @@ fun EditScreen(
                     ),
                     maxLine = 3
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Reset Password",
+                    style = TextStyle(
+                        color = MaterialTheme.colors.primary,
+                        textAlign = TextAlign.Start
+                    ),
+                    modifier = Modifier
+                        .clickable {
+                            customAlertDialogType = 1
+                            viewModel.showCustomDialog = true
+                        },
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Change Email",
+                    style = TextStyle(
+                        color = MaterialTheme.colors.primary,
+                        textAlign = TextAlign.Start
+                    ),
+                    modifier = Modifier
+                        .clickable {
+                            customAlertDialogType = 2
+                            viewModel.showCustomDialog = true
+                        },
+                )
+            }
+            if (viewModel.showCustomDialog) {
+               if ( customAlertDialogType == 1){
+                   CustomAlertDialog(
+                       modifier = Modifier
+                           .padding(10.dp)
+                           .clip(RoundedCornerShape(10.dp))
+                       ,
+                       type = customAlertDialogType,
+                       onDismissRequest = {
+                           viewModel.showCustomDialog = false
+                       },
+                       onConfirmResetPasswordRequest = { oldPass, newPass, confirmPass ->
+                           viewModel.changePassword(oldPass = oldPass, newPass = newPass, confirmPass = confirmPass)
+                       },
+                       onConfirmChangeEmail = {newEmail, oldPass ->
+
+                       }
+                   )
+               }else if ( customAlertDialogType == 2){
+                   CustomAlertDialog(
+                       modifier = Modifier
+                           .padding(10.dp)
+                           .clip(RoundedCornerShape(10.dp))
+                       ,
+                       type = customAlertDialogType,
+                       onDismissRequest = {
+                           viewModel.showCustomDialog = false
+                       },
+                       onConfirmResetPasswordRequest = { oldPass, newPass, confirmPass ->
+
+                       },
+                       onConfirmChangeEmail = {newEmail, oldPass ->
+                        viewModel.changeEmail(oldPass = oldPass, newEmail = newEmail)
+                       }
+                   )
+               }
             }
             if (viewModel.state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Center))

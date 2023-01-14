@@ -362,7 +362,7 @@ fun MapAddressItem(
             ) {
 
                 Text(
-                    text = "Search by name",
+                    text = "Search by city",
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier

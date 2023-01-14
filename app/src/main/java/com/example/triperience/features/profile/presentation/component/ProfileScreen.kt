@@ -179,7 +179,6 @@ fun ProfileScreen(
                     "${user.posts.size} post(s)"
                 } else {
                     ""
-
                 }
                 Column(
                     modifier = Modifier.fillMaxSize()
@@ -248,11 +247,6 @@ fun ProfileScreen(
                     }
                 )
             }
-
-//            if (profileViewModel.state.isLoading) {
-//                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//            }
-
         }
     }
 

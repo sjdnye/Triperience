@@ -60,7 +60,7 @@ fun PostDetailScreen(
                     postDetailViewModel.latLong!!,
                     postDetailViewModel.isMapLoaded,
                     changeMapSituation = {
-                        postDetailViewModel.isMapLoaded = !postDetailViewModel.isMapLoaded
+                        postDetailViewModel.isMapLoaded = true
                     }
                 )
             }

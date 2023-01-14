@@ -14,7 +14,6 @@ private data class IndexedWeatherData(
     val index: Int,
     val data: WeatherData
 )
-
 @RequiresApi(Build.VERSION_CODES.O)
 fun WeatherDataDto.toWeatherDataMap(): Map<Int, List<WeatherData>> {
     return time.mapIndexed { index, time ->

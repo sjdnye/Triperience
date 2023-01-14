@@ -19,17 +19,16 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun getRelevantPost(followingList: List<String>): Flow<Resource<List<Post>?>> = flow{
         try {
             emit(Resource.Loading())
-//            val query = firestore.collection(Constants.COLLECTION_POST)
-//                .whereIn(Constants.PUBLISHER_ID, followingList)
-//                .orderBy(Constants.DATE_TIME)
-//                .get()
-//                .await()
-//            val posts = query.toObjects(Post::class.java)
-
             val query = firestore.collection(Constants.COLLECTION_POST)
+                .whereIn(Constants.PUBLISHER_ID, followingList)
                 .get()
                 .await()
             val posts = query.toObjects(Post::class.java)
+
+//            val query = firestore.collection(Constants.COLLECTION_POST)
+//                .get()
+//                .await()
+//            val posts = query.toObjects(Post::class.java)
             emit(Resource.Success(data = posts.sortedByDescending { it.dateTime }))
 
         }catch (e: IOException) {

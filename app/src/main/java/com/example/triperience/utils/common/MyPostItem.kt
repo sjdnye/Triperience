@@ -1,8 +1,6 @@
 package com.example.triperience.utils.common
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -11,14 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.example.triperience.features.profile.domain.model.Post
 import com.example.triperience.features.profile.presentation.component.CoilImage
-import com.example.triperience.ui.theme.customFont
 
 @Composable
 fun MyPostItem(
@@ -77,14 +71,15 @@ fun MyPostItem(
                 onImageClick(latitude, longitude)
             }
         )
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            PostRateAndCitySection(post = post)
-            PostDateAndTimeSection(post = post)
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                PostRateAndDateSection(post = post)
+                PostStarAndTimeSection(post = post)
+            }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End

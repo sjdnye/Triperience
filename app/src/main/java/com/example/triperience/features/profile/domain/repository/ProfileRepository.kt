@@ -34,4 +34,8 @@ interface ProfileRepository {
 
     suspend fun getFollowListUsers(followList : List<String>) : Flow<Resource<List<User>?>>
 
+    suspend fun changePassword(oldPass:String, newPass:String) : Flow<Resource<Boolean>>
+
+    suspend fun changeEmail(oldPass: String, newEmail: String, userid:String) : Flow<Resource<Boolean>>
+
 }

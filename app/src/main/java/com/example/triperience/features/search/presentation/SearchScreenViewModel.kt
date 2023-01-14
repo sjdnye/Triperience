@@ -57,7 +57,7 @@ class SearchScreenViewModel @Inject constructor(
             job?.cancel()
             job = viewModelScope.launch {
                 delay(500L)
-                searchRepository.searchUsers(query = query).collect { result ->
+                searchRepository.searchUsers(query = query.trim().lowercase()).collect { result ->
                     when (result) {
                         is Resource.Success -> {
                             isLoading = false

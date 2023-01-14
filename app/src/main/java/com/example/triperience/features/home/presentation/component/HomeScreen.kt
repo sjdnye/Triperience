@@ -78,7 +78,7 @@ fun HomeScreen(
                         contentDescription = "Home screen Logo",
                         modifier = Modifier
 //                            .fillMaxHeight()
-                            ,
+                        ,
                         contentScale = ContentScale.Crop
                     )
                 },

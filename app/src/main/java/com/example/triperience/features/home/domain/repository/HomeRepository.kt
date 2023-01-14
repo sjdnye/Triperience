@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {
 
-    suspend fun getRelevantPost(followingList : List<String>) : Flow<Resource<List<Post>?>>
+    suspend fun getRelevantPost(followingList: List<String>) : Flow<Resource<List<Post>?>>
 
-//    suspend fun getPostPublisherDetail(userId: String) : User?
 }
